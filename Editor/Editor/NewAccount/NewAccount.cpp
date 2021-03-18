@@ -1,5 +1,5 @@
 #include "NewAccount.h"
-#include "CropDialog/CropDialog.h"
+#include "../CropDialog/CropDialog.h"
 #include <QMouseEvent>
 #include <QMessageBox>
 #include <QPainter>

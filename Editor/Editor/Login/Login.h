@@ -5,10 +5,10 @@
 #include <QMessageBox>
 #include <QThread>
 #include "ui_Login.h"
-#include "FileBrowser/FileBrowser.h"
-#include "NewAccount/NewAccount.h"
-#include "SocketHandler/SocketHandler.h"
-#include "Serialization/Serialize.h"
+#include "../FileBrowser/FileBrowser.h"
+#include "../NewAccount/NewAccount.h"
+#include "../SocketHandler/SocketHandler.h"
+#include "../Serialization/Serialize.h"
 
 class Login : public QMainWindow
 {

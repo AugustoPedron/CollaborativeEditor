@@ -2,7 +2,6 @@
 
 #include <QWidget>
 #include <QDialog>
-#include "ui_ModifyProfile.h"
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QRubberBand>
@@ -13,9 +12,11 @@
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 #include <QPainter>
-#include "SocketHandler/SocketHandler.h"
-#include "Serialization/Serialize.h"
-#include "Modify Password/ModifyPassword.h"
+
+#include "ui_ModifyProfile.h"
+#include "../SocketHandler/SocketHandler.h"
+#include "../Serialization/Serialize.h"
+#include "../Modify Password/ModifyPassword.h"
 
 
 class ModifyProfile : public QMainWindow

@@ -1,48 +1,190 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <ClInclude Include="Structures\FormatStructure.h">
+      <Filter>Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="Structures\MessageTypes.h">
+      <Filter>Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="CRDT\CRDT.h">
+      <Filter>CRDT</Filter>
+    </ClInclude>
+    <ClInclude Include="CRDT\Message.h">
+      <Filter>CRDT</Filter>
+    </ClInclude>
+    <ClInclude Include="CRDT\Symbol.h">
+      <Filter>CRDT</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\UserInterval.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization\define.h">
+      <Filter>Serialization</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CRDT">
+      <UniqueIdentifier>{19483cdb-64fd-4e94-97b0-548ba283ddd1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    <Filter Include="CropDialog">
+      <UniqueIdentifier>{52c39654-5685-41d6-be1c-fe132beb04e7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>qrc;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Dialog">
+      <UniqueIdentifier>{6c2f84ee-bf09-4441-96ba-72951d663d01}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Form Files">
-      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
-      <Extensions>ui</Extensions>
+    <Filter Include="Editor">
+      <UniqueIdentifier>{1f5656b9-09d2-4904-ba89-bac0f81bb447}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Translation Files">
-      <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
-      <Extensions>ts</Extensions>
+    <Filter Include="FileBrowser">
+      <UniqueIdentifier>{24264c1e-4815-4ed6-af40-4ea95895af6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Icons">
+      <UniqueIdentifier>{12b966f7-2569-4f02-a476-e5a9b73721f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Login">
+      <UniqueIdentifier>{d12aa4f6-6708-403e-aaf3-a337737a2a71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ModifyPassword">
+      <UniqueIdentifier>{b6074662-d328-418b-b32d-6179d1dd5bbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ModifyProfile">
+      <UniqueIdentifier>{2edacef7-b3d7-423f-bf2c-5971af823dc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NewAccount">
+      <UniqueIdentifier>{144e638a-4483-4efd-aeee-850206d30739}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SocketHandler">
+      <UniqueIdentifier>{6e2d6d96-f820-4e7e-9aa8-84872e5b1444}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Serialization">
+      <UniqueIdentifier>{9ee286a0-8a52-4a9b-a0e5-2e237d10fa42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Structures">
+      <UniqueIdentifier>{137808bf-99fb-4792-85a2-9173a41519e7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="Resources.qrc">
-      <Filter>Resource Files</Filter>
-    </QtRcc>
-    <QtUic Include="Editor.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtMoc Include="Editor.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <ClCompile Include="Editor.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="CRDT\CRDT.cpp">
+      <Filter>CRDT</Filter>
     </ClCompile>
-    <ResourceCompile Include="$pro_name$.rc">
-    </ResourceCompile>
-    <None Include="$pro_name$.ico">
-      <Filter>Resource Files</Filter>
+    <ClCompile Include="CRDT\Message.cpp">
+      <Filter>CRDT</Filter>
+    </ClCompile>
+    <ClCompile Include="CRDT\Symbol.cpp">
+      <Filter>CRDT</Filter>
+    </ClCompile>
+    <ClCompile Include="CropDialog\CropDialog.cpp">
+      <Filter>CropDialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog\Dialog.cpp">
+      <Filter>Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\CustomCursor.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Editor.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\MyTextEdit.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\UserInterval.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="FileBrowser\FileBrowser.cpp">
+      <Filter>FileBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="Login\Login.cpp">
+      <Filter>Login</Filter>
+    </ClCompile>
+    <ClCompile Include="Modify Password\ModifyPassword.cpp">
+      <Filter>ModifyPassword</Filter>
+    </ClCompile>
+    <ClCompile Include="Modify Profile\ModifyProfile.cpp">
+      <Filter>ModifyProfile</Filter>
+    </ClCompile>
+    <ClCompile Include="NewAccount\NewAccount.cpp">
+      <Filter>NewAccount</Filter>
+    </ClCompile>
+    <ClCompile Include="Serialization\Serialize.cpp">
+      <Filter>Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="SocketHandler\SocketHandler.cpp">
+      <Filter>SocketHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="CropDialog\CropDialog.h">
+      <Filter>CropDialog</Filter>
+    </QtMoc>
+    <QtMoc Include="Dialog\Dialog.h">
+      <Filter>Dialog</Filter>
+    </QtMoc>
+    <QtMoc Include="Editor\CustomCursor.h">
+      <Filter>Editor</Filter>
+    </QtMoc>
+    <QtMoc Include="Editor\Editor.h">
+      <Filter>Editor</Filter>
+    </QtMoc>
+    <QtMoc Include="Editor\MyTextEdit.h">
+      <Filter>Editor</Filter>
+    </QtMoc>
+    <QtMoc Include="FileBrowser\FileBrowser.h">
+      <Filter>FileBrowser</Filter>
+    </QtMoc>
+    <QtMoc Include="Login\Login.h">
+      <Filter>Login</Filter>
+    </QtMoc>
+    <QtMoc Include="Modify Password\ModifyPassword.h">
+      <Filter>ModifyPassword</Filter>
+    </QtMoc>
+    <QtMoc Include="Modify Profile\ModifyProfile.h">
+      <Filter>ModifyProfile</Filter>
+    </QtMoc>
+    <QtMoc Include="NewAccount\NewAccount.h">
+      <Filter>NewAccount</Filter>
+    </QtMoc>
+    <QtMoc Include="Serialization\Serialize.h">
+      <Filter>Serialization</Filter>
+    </QtMoc>
+    <QtMoc Include="SocketHandler\SocketHandler.h">
+      <Filter>SocketHandler</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="CropDialog\CropDialog.ui">
+      <Filter>CropDialog</Filter>
+    </QtUic>
+    <QtUic Include="Dialog\Dialog.ui">
+      <Filter>Dialog</Filter>
+    </QtUic>
+    <QtUic Include="Editor\Editor.ui">
+      <Filter>Editor</Filter>
+    </QtUic>
+    <QtUic Include="FileBrowser\FileBrowser.ui">
+      <Filter>FileBrowser</Filter>
+    </QtUic>
+    <QtUic Include="Login\Login.ui">
+      <Filter>Login</Filter>
+    </QtUic>
+    <QtUic Include="Modify Password\ModifyPassword.ui">
+      <Filter>ModifyPassword</Filter>
+    </QtUic>
+    <QtUic Include="Modify Profile\ModifyProfile.ui">
+      <Filter>ModifyProfile</Filter>
+    </QtUic>
+    <QtUic Include="NewAccount\NewAccount.ui">
+      <Filter>NewAccount</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Editor\desktop.ini">
+      <Filter>Editor</Filter>
     </None>
-    <None Include="$pro_name$.def">
-      <Filter>Resource Files</Filter>
-    </None>
-
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="Resources.qrc" />
   </ItemGroup>
 </Project>

@@ -1,10 +1,10 @@
-#include "Editor.h"
+#include "Login/Login.h"
 #include <QtWidgets/QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    Editor w;
+    Login w;
     w.show();
     return a.exec();
 }

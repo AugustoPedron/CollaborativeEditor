@@ -9,11 +9,12 @@
 #include <QTreeView>
 #include <QCloseEvent>
 #include <QLineEdit>
-#include "Editor/Editor.h"
-#include "SocketHandler/SocketHandler.h"
-#include "Serialization/Serialize.h"
-#include "Modify Profile/ModifyProfile.h"
-#include "Dialog/Dialog.h"
+
+#include "../Editor/Editor.h"
+#include "../SocketHandler/SocketHandler.h"
+#include "../Serialization/Serialize.h"
+#include "../Modify Profile/ModifyProfile.h"
+#include "../Dialog/Dialog.h"
 #include "ui_FileBrowser.h"
 
 class FileBrowser : public QMainWindow

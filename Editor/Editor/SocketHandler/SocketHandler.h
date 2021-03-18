@@ -6,7 +6,8 @@
 #include <QCloseEvent>
 #include <QSharedPointer>
 #include <thread>
-#include "Serialization/Serialize.h"
+
+#include "../Serialization/Serialize.h"
 
 class SocketHandler : public QObject
 {

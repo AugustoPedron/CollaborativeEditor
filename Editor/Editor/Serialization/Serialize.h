@@ -1,11 +1,6 @@
-
 #pragma once
-#include "Serialize.h"
+
 #include <QtWidgets/QWidget>
-//#include "ui_Serialize.h"
-#include "CRDT/Message.h"
-#include "define.h"
-#include "Editor/CustomCursor.h"
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonArray>
@@ -16,6 +11,11 @@
 #include <string>
 #include <vector>
 #include <QByteArray>
+
+#include "Serialize.h"
+#include "define.h"
+#include "../Editor/CustomCursor.h"
+#include "../CRDT/Message.h"
 
 class Serialize : public QObject
 {

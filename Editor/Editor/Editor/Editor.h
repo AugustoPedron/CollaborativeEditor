@@ -2,15 +2,16 @@
 
 #include "ui_Editor.h"
 #include <QMainWindow>
-#include "CRDT/CRDT.h"
 #include <QKeyEvent>
 #include <Qt>
 #include <iostream>
 #include <QFontComboBox>
 #include <QtWidgets>
-#include "Structures/FormatStructure.h"
-#include "SocketHandler/SocketHandler.h"
-#include "Serialization/Serialize.h"
+
+#include "../CRDT/CRDT.h"
+#include "../Structures/FormatStructure.h"
+#include "../SocketHandler/SocketHandler.h"
+#include "../Serialization/Serialize.h"
 #include "MyTextEdit.h"
 #include "UserInterval.h"
 

@@ -2,10 +2,11 @@
 #include <QObject>
 #include <QTextEdit>
 #include <QLabel>
-#include "CRDT/CRDT.h"
 #include "QTimer"
 #include <queue>
 #include <QPair>
+
+#include "../CRDT/CRDT.h"
 
 class Editor;
 class MyTextEdit;

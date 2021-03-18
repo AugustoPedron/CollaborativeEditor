@@ -1,7 +1,8 @@
-#include "ModifyProfile.h"
-#include "CropDialog/CropDialog.h"
 #include <QMouseEvent>
 #include <QMessageBox>
+
+#include "ModifyProfile.h"
+#include "../CropDialog/CropDialog.h"
 #define RUBBER_SIZE 125
 
 ModifyProfile::ModifyProfile(QSharedPointer<SocketHandler> socketHandler, QString username, QString email, QSharedPointer<QPixmap> profileImage, QMainWindow* parent) : QMainWindow(parent), m_socketHandler(socketHandler),

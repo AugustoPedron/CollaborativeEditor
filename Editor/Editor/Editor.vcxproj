@@ -10,13 +10,68 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CRDT\CRDT.h" />
+    <ClInclude Include="CRDT\Message.h" />
+    <ClInclude Include="CRDT\Symbol.h" />
+    <ClInclude Include="Editor\UserInterval.h" />
+    <ClInclude Include="Serialization\define.h" />
+    <QtMoc Include="SocketHandler\SocketHandler.h" />
+    <QtMoc Include="Serialization\Serialize.h" />
+    <QtMoc Include="NewAccount\NewAccount.h" />
+    <QtMoc Include="Modify Profile\ModifyProfile.h" />
+    <QtMoc Include="Modify Password\ModifyPassword.h" />
+    <QtMoc Include="Login\Login.h" />
+    <QtMoc Include="FileBrowser\FileBrowser.h" />
+    <QtMoc Include="Editor\MyTextEdit.h" />
+    <QtMoc Include="Editor\Editor.h" />
+    <QtMoc Include="Editor\CustomCursor.h" />
+    <QtMoc Include="Dialog\Dialog.h" />
+    <QtMoc Include="CropDialog\CropDialog.h" />
+    <ClInclude Include="Structures\FormatStructure.h" />
+    <ClInclude Include="Structures\MessageTypes.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CRDT\CRDT.cpp" />
+    <ClCompile Include="CRDT\Message.cpp" />
+    <ClCompile Include="CRDT\Symbol.cpp" />
+    <ClCompile Include="CropDialog\CropDialog.cpp" />
+    <ClCompile Include="Dialog\Dialog.cpp" />
+    <ClCompile Include="Editor\CustomCursor.cpp" />
+    <ClCompile Include="Editor\Editor.cpp" />
+    <ClCompile Include="Editor\MyTextEdit.cpp" />
+    <ClCompile Include="Editor\UserInterval.cpp" />
+    <ClCompile Include="FileBrowser\FileBrowser.cpp" />
+    <ClCompile Include="Login\Login.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Modify Password\ModifyPassword.cpp" />
+    <ClCompile Include="Modify Profile\ModifyProfile.cpp" />
+    <ClCompile Include="NewAccount\NewAccount.cpp" />
+    <ClCompile Include="Serialization\Serialize.cpp" />
+    <ClCompile Include="SocketHandler\SocketHandler.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="CropDialog\CropDialog.ui" />
+    <QtUic Include="Dialog\Dialog.ui" />
+    <QtUic Include="Editor\Editor.ui" />
+    <QtUic Include="FileBrowser\FileBrowser.ui" />
+    <QtUic Include="Login\Login.ui" />
+    <QtUic Include="Modify Password\ModifyPassword.ui" />
+    <QtUic Include="Modify Profile\ModifyProfile.ui" />
+    <QtUic Include="NewAccount\NewAccount.ui" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Editor\desktop.ini" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="Resources.qrc" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B46EEE7E-1B46-4F16-A681-0F80F6300C55}</ProjectGuid>
     <Keyword>QtVS_v304</Keyword>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0.19041.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0.19041.0</WindowsTargetPlatformVersion>
-    <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')"
-      >$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+    <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
@@ -33,7 +88,7 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>5.12.10_msvc2017_64</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;network;printsupport;websockets;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
@@ -41,11 +96,8 @@
     <QtModules>core;gui;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
-  <Target Name="QtMsBuildNotFound"
-    BeforeTargets="CustomBuild;ClCompile"
-    Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
-    <Message Importance="High"
-      Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
+  <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
+    <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
   </Target>
   <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="Shared" />
@@ -62,6 +114,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
   </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <QtMoc>
+      <ParallelProcess>true</ParallelProcess>
+    </QtMoc>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
@@ -88,14 +145,6 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <QtRcc Include="Resources.qrc"/>
-    <QtUic Include="Editor.ui"/>
-    <QtMoc Include="Editor.h"/>
-    <ClCompile Include="Editor.cpp"/>
-    <ClCompile Include="main.cpp"/>
-
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
     <Import Project="$(QtMsBuild)\qt.targets" />

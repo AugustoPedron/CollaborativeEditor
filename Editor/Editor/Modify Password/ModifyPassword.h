@@ -29,8 +29,9 @@
 #include <QMessageBox>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
+
 #include "ui_ModifyPassword.h"
-#include "SocketHandler/SocketHandler.h"
+#include "../SocketHandler/SocketHandler.h"
 
 class ModifyPassword : public QDialog
 {
