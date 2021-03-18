@@ -1,7 +1,5 @@
 #pragma once
 
-#include "CRDT/Message.h"
-#include "define.h"
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonArray>
@@ -12,6 +10,9 @@
 #include <vector>
 #include <QByteArray>
 #include <QPixmap>
+
+#include "define.h"
+#include "../CRDT/Message.h"
 
 class Serialize
 {
@@ -34,7 +35,7 @@ public:
     static QStringList userUnserialize(QJsonObject obj);//in particolare la lista contiene 2 elementi se uso login oppure 3 se uso
     //la register l'immagine viene serializzata a parte per ora
 
-    //usate in DBInteraction per login
+    //usate in DatabaseManager per login
     //static QJsonArray singleFileSerialize(QString fileName, int fileId, QJsonArray files);// ilio
     static QJsonObject FileListSerialize(QMap<int, QString> files, int type);// ilio
     static QMap<int, QString> fileListUnserialize(QJsonObject obj);// ilio

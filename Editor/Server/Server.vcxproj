@@ -32,7 +32,7 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>5.12.10_msvc2017_64</QtInstall>
-    <QtModules>core;network;websockets</QtModules>
+    <QtModules>core;network;sql;websockets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
@@ -85,7 +85,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ClientManager\clientmanager.cpp" />
+    <ClCompile Include="CRDT\CRDT.cpp" />
+    <ClCompile Include="CRDT\Message.cpp" />
+    <ClCompile Include="CRDT\Symbol.cpp" />
+    <ClCompile Include="DatabaseManager\DatabaseManager.cpp" />
+    <ClCompile Include="File\file.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Serialize\Serialize.cpp" />
+    <ClCompile Include="Server\myserver.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="ClientManager\clientmanager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="CRDT\CRDT.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CRDT\Message.h" />
+    <ClInclude Include="CRDT\Symbol.h" />
+    <ClInclude Include="DatabaseManager\DatabaseManager.h" />
+    <ClInclude Include="File\file.h" />
+    <ClInclude Include="Serialize\define.h" />
+    <ClInclude Include="Serialize\Serialize.h" />
+    <QtMoc Include="Server\myserver.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

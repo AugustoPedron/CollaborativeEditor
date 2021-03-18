@@ -1,26 +1,81 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <ClCompile Include="ClientManager\clientmanager.cpp">
+      <Filter>ClientManager</Filter>
+    </ClCompile>
+    <ClCompile Include="CRDT\CRDT.cpp">
+      <Filter>CRDT</Filter>
+    </ClCompile>
+    <ClCompile Include="CRDT\Message.cpp">
+      <Filter>CRDT</Filter>
+    </ClCompile>
+    <ClCompile Include="CRDT\Symbol.cpp">
+      <Filter>CRDT</Filter>
+    </ClCompile>
+    <ClCompile Include="DatabaseManager\DatabaseManager.cpp">
+      <Filter>DatabaseManager</Filter>
+    </ClCompile>
+    <ClCompile Include="File\file.cpp">
+      <Filter>File</Filter>
+    </ClCompile>
+    <ClCompile Include="Serialize\Serialize.cpp">
+      <Filter>Serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="Server\myserver.cpp">
+      <Filter>Server</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ClientManager">
+      <UniqueIdentifier>{fc9b088d-3d8c-424b-b575-70d220a81905}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    <Filter Include="CRDT">
+      <UniqueIdentifier>{31a745c4-5192-47d0-895b-b2f412b81069}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>qrc;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="DatabaseManager">
+      <UniqueIdentifier>{628a08dc-ed2e-4bb8-81f0-30059213b7ed}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Translation Files">
-      <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
-      <Extensions>ts</Extensions>
+    <Filter Include="File">
+      <UniqueIdentifier>{dbac39ee-4347-4c45-92c9-873738974f74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Serialize">
+      <UniqueIdentifier>{fec099d7-ed4a-45d1-87e7-6e21fb9a5ee6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Server">
+      <UniqueIdentifier>{901a351c-8466-4a50-95fa-0f3e8b5158c8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <QtMoc Include="ClientManager\clientmanager.h">
+      <Filter>ClientManager</Filter>
+    </QtMoc>
+    <QtMoc Include="CRDT\CRDT.h">
+      <Filter>CRDT</Filter>
+    </QtMoc>
+    <QtMoc Include="Server\myserver.h">
+      <Filter>Server</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CRDT\Message.h">
+      <Filter>CRDT</Filter>
+    </ClInclude>
+    <ClInclude Include="CRDT\Symbol.h">
+      <Filter>CRDT</Filter>
+    </ClInclude>
+    <ClInclude Include="DatabaseManager\DatabaseManager.h">
+      <Filter>DatabaseManager</Filter>
+    </ClInclude>
+    <ClInclude Include="File\file.h">
+      <Filter>File</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialize\define.h">
+      <Filter>Serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialize\Serialize.h">
+      <Filter>Serialize</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

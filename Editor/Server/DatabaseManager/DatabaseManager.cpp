@@ -1,4 +1,4 @@
-#include "dbinteraction.h"
+#include "DatabaseManager.h"
 #include <QDir>
 #include <QDataStream>
 #include <QRandomGenerator>
@@ -8,12 +8,12 @@ DatabaseManager* DatabaseManager::instance = nullptr;
 
 DatabaseManager::DatabaseManager() {}
 
-DBInteraction* DBInteraction::startDBConnection() {
+DatabaseManager* DatabaseManager::startDBConnection() {
     bool err = false;
     QString path = QDir::currentPath().append("/project.sqlite");
 
     if (!instance) {
-        instance = new DBInteraction();
+        instance = new DatabaseManager();
         const QString DRIVER("QSQLITE");
         bool exist = false;
 
@@ -80,11 +80,11 @@ DBInteraction* DBInteraction::startDBConnection() {
     }
     else {
         instance->db.close();
-        return DBInteraction::instance;
+        return DatabaseManager::instance;
     }
 }
 
-QString DBInteraction::generateRandomString(int len) {
+QString DatabaseManager::generateRandomString(int len) {
     /* QString alphabet = { '0','1','2','3','4','5','6','7','8','9',
                                'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
                                'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z' };*/
@@ -99,7 +99,7 @@ QString DBInteraction::generateRandomString(int len) {
 }
 
 //sarebbe bene non creare funzioni separate per la scrittura su socket ma usare quella nella classe ClientManager
-/*void DBInteraction::sendMessage(QTcpSocket *socket, QByteArray obj){
+/*void DatabaseManager::sendMessage(QTcpSocket *socket, QByteArray obj){
     // questa funzione invia per prima cosa la dimensione dell'oggetto serializzato sul socket, per poi inviare l'oggetto vero e proprio.
 
     if(socket->state() == QAbstractSocket::ConnectedState){
@@ -112,7 +112,7 @@ QString DBInteraction::generateRandomString(int len) {
 
 }*/
 
-void DBInteraction::sendError(ClientManager* client) {
+void DatabaseManager::sendError(ClientManager* client) {
     QString message;
     QByteArray response;
 
@@ -123,7 +123,7 @@ void DBInteraction::sendError(ClientManager* client) {
     return;
 }
 
-void DBInteraction::sendSuccess(ClientManager* client) {
+void DatabaseManager::sendSuccess(ClientManager* client) {
     QString message;
     QByteArray response;
 
@@ -134,7 +134,7 @@ void DBInteraction::sendSuccess(ClientManager* client) {
     return;
 }
 
-bool DBInteraction::is_email_valid(QString email) {
+bool DatabaseManager::is_email_valid(QString email) {
 
     QRegularExpression re("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b", QRegularExpression::CaseInsensitiveOption);   //("([a-z]+)([_.a-z0-9]*)([a-z0-9]+)(@)([a-z]+)([.a-z]+)([a-z]+)");      //("(\\w+)(\\.|_)?(\\w*)@(\\w+)(\\.(\\w+))+");
     QSqlQuery query;
@@ -177,7 +177,7 @@ bool DBInteraction::is_email_valid(QString email) {
 
 }
 
-bool DBInteraction::is_username_unique(QString username){
+bool DatabaseManager::is_username_unique(QString username){
     QSqlQuery query;
     int cnt = 0;
 
@@ -208,7 +208,7 @@ bool DBInteraction::is_username_unique(QString username){
     return true;
 }
 
-QString DBInteraction::computeHashPassword(QString password) {
+QString DatabaseManager::computeHashPassword(QString password) {
     QString hashed_pwd;
     QString salt;
     QByteArray salted_pwd;
@@ -219,7 +219,7 @@ QString DBInteraction::computeHashPassword(QString password) {
     return hashed_pwd;
 }
 
-bool DBInteraction::checkPassword(QString password, ClientManager* client) {
+bool DatabaseManager::checkPassword(QString password, ClientManager* client) {
 
 
     if (instance->db.open()) {
@@ -280,7 +280,7 @@ bool DBInteraction::checkPassword(QString password, ClientManager* client) {
     }
 }
 
-void DBInteraction::registration(QString username, QString email, QString password, QString profileImage, ClientManager* incomingClient) {
+void DatabaseManager::registration(QString username, QString email, QString password, QString profileImage, ClientManager* incomingClient) {
 
 
     QByteArray salted_pwd;
@@ -395,7 +395,7 @@ void DBInteraction::registration(QString username, QString email, QString passwo
     return;
 }
 
-void DBInteraction::login(QString username, QString password, ClientManager* incomingClient) {
+void DatabaseManager::login(QString username, QString password, ClientManager* incomingClient) {
 
 
     QSqlQuery query;
@@ -483,7 +483,7 @@ void DBInteraction::login(QString username, QString password, ClientManager* inc
     return;
 }
 
-void DBInteraction::logout(ClientManager* client) {
+void DatabaseManager::logout(ClientManager* client) {
 
 
     //cancella semplicemente l'utente dalle strutture interne(mappe) locali del server
@@ -498,7 +498,7 @@ void DBInteraction::logout(ClientManager* client) {
     instance->activeusers.removeOne(client);
 }
 
-void DBInteraction::createFile(QString filename, ClientManager* client) {
+void DatabaseManager::createFile(QString filename, ClientManager* client) {
 
 
     QSqlQuery query;
@@ -619,7 +619,7 @@ void DBInteraction::createFile(QString filename, ClientManager* client) {
     return;
 }
 
-void DBInteraction::sendFileList(ClientManager* client) {
+void DatabaseManager::sendFileList(ClientManager* client) {
 
 
     if (!instance->isUserLogged(client)) {
@@ -676,7 +676,7 @@ void DBInteraction::sendFileList(ClientManager* client) {
     }
 }
 
-void DBInteraction::openFile(int fileId, ClientManager* client) {
+void DatabaseManager::openFile(int fileId, ClientManager* client) {
 
 
     File* f = nullptr;
@@ -786,7 +786,7 @@ void DBInteraction::openFile(int fileId, ClientManager* client) {
     }
 }
 
-void DBInteraction::closeFile(int fileId, int siteCounter, ClientManager* client) {
+void DatabaseManager::closeFile(int fileId, int siteCounter, ClientManager* client) {
 
 
     //per ogni utente che richiede la chiusura del file verrÃ  fatta una removeUser
@@ -872,7 +872,7 @@ void DBInteraction::closeFile(int fileId, int siteCounter, ClientManager* client
     return;
 }
 
-void DBInteraction::deleteFile(int fileId, ClientManager* client) {
+void DatabaseManager::deleteFile(int fileId, ClientManager* client) {
 
 
     //per ogni utente che richiede la cancellazione verrÃ  cancellata nel DB la riga corrispondente
@@ -964,7 +964,7 @@ void DBInteraction::deleteFile(int fileId, ClientManager* client) {
     return;
 }
 
-QString DBInteraction::changeFileName(QString oldPath, QString newName, int fileId, ClientManager* client){
+QString DatabaseManager::changeFileName(QString oldPath, QString newName, int fileId, ClientManager* client){
 
 
     QString newPath;
@@ -1013,7 +1013,7 @@ QString DBInteraction::changeFileName(QString oldPath, QString newName, int file
 
 }
 
-void DBInteraction::renameFile(int fileId, QString newName, ClientManager* client) {
+void DatabaseManager::renameFile(int fileId, QString newName, ClientManager* client) {
 
 
     // per ogni file bisogna cambiare il nome all'interno del DB e il nome del path (anche nel DB), cosa fatta nella closeFile
@@ -1110,7 +1110,7 @@ void DBInteraction::renameFile(int fileId, QString newName, ClientManager* clien
     }
 }
 
-void DBInteraction::getURIToShare(int fileid, ClientManager* client) {
+void DatabaseManager::getURIToShare(int fileid, ClientManager* client) {
 
 
     QByteArray response;
@@ -1131,7 +1131,7 @@ void DBInteraction::getURIToShare(int fileid, ClientManager* client) {
     }
 }
 
-void DBInteraction::SharedFileAcquisition(QString URI, ClientManager* client) {
+void DatabaseManager::SharedFileAcquisition(QString URI, ClientManager* client) {
 
 
     QByteArray response;
@@ -1213,7 +1213,7 @@ void DBInteraction::SharedFileAcquisition(QString URI, ClientManager* client) {
     }
 }
 
-void DBInteraction::changePassword(QString oldPassword, QString newPassword, ClientManager* client) {
+void DatabaseManager::changePassword(QString oldPassword, QString newPassword, ClientManager* client) {
 
     if (!instance->isUserLogged(client)) {
         return;
@@ -1259,7 +1259,7 @@ void DBInteraction::changePassword(QString oldPassword, QString newPassword, Cli
 }
 
 /*
-* void DBInteraction::changeUsername(QString newUsername, ClientManager* client) {
+* void DatabaseManager::changeUsername(QString newUsername, ClientManager* client) {
 
     if (instance->db.open()) {
         int userid = client->getId();
@@ -1291,7 +1291,7 @@ void DBInteraction::changePassword(QString oldPassword, QString newPassword, Cli
 }
 
 
-void DBInteraction::changeEmail(QString newEmail, ClientManager* client) {
+void DatabaseManager::changeEmail(QString newEmail, ClientManager* client) {
     QByteArray response;
     QString message;
 
@@ -1335,7 +1335,7 @@ void DBInteraction::changeEmail(QString newEmail, ClientManager* client) {
 }
 
 
-void DBInteraction::changeProfilePic(QString profileImage, ClientManager* client) {
+void DatabaseManager::changeProfilePic(QString profileImage, ClientManager* client) {
     QString username = client->getUsername();
     QByteArray response;
     QString message;
@@ -1396,7 +1396,7 @@ void DBInteraction::changeProfilePic(QString profileImage, ClientManager* client
 
 */
 
-void DBInteraction::changeProfile(QString oldUsername, QString newUsername, QString oldEmail, QString newEmail, QString newImage, ClientManager* client) {
+void DatabaseManager::changeProfile(QString oldUsername, QString newUsername, QString oldEmail, QString newEmail, QString newImage, ClientManager* client) {
 
 
     if (!instance->isUserLogged(client)) {
@@ -1492,7 +1492,7 @@ void DBInteraction::changeProfile(QString oldUsername, QString newUsername, QStr
 
 }
 
-void DBInteraction::forwardMessage(ClientManager* user, QJsonObject obj, QByteArray data)
+void DatabaseManager::forwardMessage(ClientManager* user, QJsonObject obj, QByteArray data)
 {
     //qDebug()<< data;
     QPair<int, Message> fileid_message = Serialize::messageUnserialize(obj);
@@ -1502,11 +1502,11 @@ void DBInteraction::forwardMessage(ClientManager* user, QJsonObject obj, QByteAr
     f->messageHandler(user, fileid_message.second, data);
 }
 
-File* DBInteraction::getFile(int fileid) {
+File* DatabaseManager::getFile(int fileid) {
     return instance->files.value(fileid);
 }
 
-bool DBInteraction::isUserLogged(ClientManager* client) {
+bool DatabaseManager::isUserLogged(ClientManager* client) {
 
     if (!instance->activeusers.contains(client)) {
         qDebug() << "user not authorized!\n";
@@ -1519,7 +1519,7 @@ bool DBInteraction::isUserLogged(ClientManager* client) {
 
 }
 
-QByteArray DBInteraction::intToArray(qint64 source) {
+QByteArray DatabaseManager::intToArray(qint64 source) {
     QByteArray temp;
     QDataStream data(&temp, QIODevice::ReadWrite);
     data << source;
@@ -1527,7 +1527,7 @@ QByteArray DBInteraction::intToArray(qint64 source) {
 }
 
 //generazione casuale di un colore ed inserimento nella lista cosÃ¬ che non venga ripetuto
-QColor DBInteraction::generateRandomColor(int userId) {
+QColor DatabaseManager::generateRandomColor(int userId) {
     QColor newColor;
     do {
         newColor = QColor::fromRgb(QRandomGenerator::global()->generate());
@@ -1536,7 +1536,7 @@ QColor DBInteraction::generateRandomColor(int userId) {
     return newColor;
 }
 
-bool DBInteraction::colorPresent(QColor color) {
+bool DatabaseManager::colorPresent(QColor color) {
     for (auto it = m_colorPerUser.begin(); it != m_colorPerUser.end(); it++) {
         if (it.value() == color) return true;
     }

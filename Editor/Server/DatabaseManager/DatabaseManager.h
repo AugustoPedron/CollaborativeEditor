@@ -16,9 +16,11 @@
 #include <QJsonDocument>
 #include <QFile>
 #include <QRegularExpression>
-#include "Serialize/Serialize.h"
-#include "Serialize/define.h"
-#include "file.h"
+
+#include "../Serialize/Serialize.h"
+#include "../Serialize/define.h"
+#include "../File/file.h"
+#include "../ClientManager/clientmanager.h"
 
 class Serialize;
 class File;
@@ -76,7 +78,7 @@ public:
     inline QColor getUserColor(int userId){return m_colorPerUser.value(userId);}
 
 private:
-    static DBInteraction* instance;
+    static DatabaseManager* instance;
     QSqlDatabase db;
 
     QVector<ClientManager*> activeusers;

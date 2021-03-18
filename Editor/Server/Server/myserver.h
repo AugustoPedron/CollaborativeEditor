@@ -1,5 +1,4 @@
-#ifndef MYSERVER_H
-#define MYSERVER_H
+#pragma once
 
 #include <QObject>
 #include <QHostAddress>
@@ -12,14 +11,15 @@
 #include <vector>
 #include <QDir>
 #include <QDataStream>
-#include "Serialize/Serialize.h"
-#include "Serialize/define.h"
-#include "dbinteraction.h"
-#include "file.h"
-#include "CRDT/CRDT.h"
-#include "CRDT/Message.h"
-#include "CRDT/Symbol.h"
-#include "ClientManager/clientmanager.h"
+
+#include "../Serialize/Serialize.h"
+#include "../Serialize/define.h"
+#include "../File/file.h"
+#include "../CRDT/CRDT.h"
+#include "../CRDT/Message.h"
+#include "../CRDT/Symbol.h"
+#include "../ClientManager/clientmanager.h"
+#include "../DatabaseManager/DatabaseManager.h"
 
 class CRDT;
 class Serialize;
@@ -53,7 +53,7 @@ private:
     QFile* m_logFile; //file di log usato per debug
     QTextStream* m_logFileStream;
     //#####################################
-    DBInteraction *db = nullptr;
+    DatabaseManager *db = nullptr;
 
 
     //std::map<int, CRDT*> fileId_CRDT;//mi serve un crdt per ogni file
@@ -65,5 +65,3 @@ private:
     //bool addFile(int fileID, std::string path);//false se file già presente o errore
     //void removeFile(int fileID);// se lo trova elimina altrimenti non fa nulla
 };
-
-#endif // MYSERVER_H

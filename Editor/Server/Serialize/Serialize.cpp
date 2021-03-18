@@ -1,15 +1,13 @@
-#include "Serialize.h"
-#include "CRDT/CRDT.h"
 #include <QBuffer>
 #include <QJsonDocument>
 #include <QDebug>
 
+#include "Serialize.h"
+#include "../CRDT/CRDT.h"
 
 Serialize::Serialize(QWidget* parent)
 {
 }
-
-
 
 QJsonObject Serialize::userSerialize(QString username, QString email, QString password, QString profileImage, int type)
 {

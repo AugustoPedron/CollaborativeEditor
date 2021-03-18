@@ -1,11 +1,11 @@
-#ifndef FILE_H
-#define FILE_H
+#pragma once
 
 #include <QObject>
-#include "CRDT/CRDT.h"
 #include <QTcpSocket>
-#include "Serialize/Serialize.h"
-#include "ClientManager/clientmanager.h"
+
+#include "../CRDT/CRDT.h"
+#include "../Serialize/Serialize.h"
+#include "../ClientManager/clientmanager.h"
 
 struct CursorPosition{
     std::vector<int> pos;
@@ -52,5 +52,3 @@ private:
     QMap <ClientManager*, CursorPosition> m_usersCursorPosition;
 
 };
-
-#endif // FILE_H

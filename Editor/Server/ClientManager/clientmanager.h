@@ -1,5 +1,4 @@
-#ifndef CLIENTMANAGER_H
-#define CLIENTMANAGER_H
+#pragma once
 
 #include <QObject>
 #include <QColor>
@@ -53,5 +52,3 @@ private:
     void readThreadFunction();
     void parseEmitMessages(QByteArray* message);
 };
-
-#endif // CLIENTMANAGER_H
