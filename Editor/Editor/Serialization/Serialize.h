@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QtWidgets/QWidget>
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonArray>
@@ -12,8 +11,8 @@
 #include <vector>
 #include <QByteArray>
 
-#include "Serialize.h"
 #include "define.h"
+#include "Serialize.h"
 #include "../Editor/CustomCursor.h"
 #include "../CRDT/Message.h"
 
@@ -44,32 +43,32 @@ public:
 	static QStringList userUnserialize(QJsonObject obj);//in particolare la lista contiene 2 elementi se uso login oppure 3 se uso
 	//la register l'immagine viene serializzata a parte per ora
 
-	static QJsonObject changePasswordSerialize(QString oldPassword, QString newPassword, int type);// ilio
-	static QStringList changePasswordUnserialize(QJsonObject obj); // ilio
+	static QJsonObject changePasswordSerialize(QString oldPassword, QString newPassword, int type);
+	static QStringList changePasswordUnserialize(QJsonObject obj);
 
 	static QJsonObject fileNameSerialize(QString fileName, int type);
 
 	static QString fileNameUnserialize(QJsonObject obj);
 
-	static QJsonObject FileListSerialize(QMap<int, QString> files, int type);// ilio
-	static QMap<int, QString> fileListUnserialize(QJsonObject obj);// ilio
+	static QJsonObject FileListSerialize(QMap<int, QString> files, int type);
+	static QMap<int, QString> fileListUnserialize(QJsonObject obj);
 
-	static QJsonObject newFileSerialize(QString filename, int type);// ilio
-	static QPair<int,QString> newFileUnserialize(QJsonObject obj);// ilio
+	static QJsonObject newFileSerialize(QString filename, int type);
+	static QPair<int,QString> newFileUnserialize(QJsonObject obj);
 
-	static QJsonObject openDeleteFileSerialize(int fileId, int type); // ilio
-	static int openDeleteFileUnserialize(QJsonObject obj);// ilio
+	static QJsonObject openDeleteFileSerialize(int fileId, int type);
+	static int openDeleteFileUnserialize(QJsonObject obj);
 
 	static QJsonObject closeFileSerialize(int fileId, int siteCounter, int type);
 	static QPair<int, int> closeFileUnserialize(QJsonObject obj);
 
-	static QJsonObject renameFileSerialize(int fileId, QString newName, int type); // ilio
+	static QJsonObject renameFileSerialize(int fileId, QString newName, int type);
 	static QStringList renameFileUnserialize(QJsonObject obj);
 
-	static QJsonObject openSharedFileSerialize(QString URI, int type); // ilio
-	static QString openSharedFileUnserialize(QJsonObject obj); // ilio
+	static QJsonObject openSharedFileSerialize(QString URI, int type);
+	static QString openSharedFileUnserialize(QJsonObject obj);
 
-	static QStringList changeProfileResponseUnserialize(QJsonObject obj); //ilio
+	static QStringList changeProfileResponseUnserialize(QJsonObject obj);
 
 	static QJsonObject messageSerialize(Message message, int fileId, int type);//qui abbiamo sia il messaggio con all'interno un simbolo
 	static QPair<int, Message> messageUnserialize(QJsonObject obj);
@@ -93,29 +92,22 @@ public:
 	static QJsonObject cursorSerialize(CustomCursor cursor, int type);
 	static CustomCursor cursorUnserialize(QJsonObject obj);
 
-	static QJsonObject addEditingUserSerialize(int userId, QString username, QColor userColor, int fileId, int type); //augusto
-	static QPair<int, QStringList> addEditingUserUnserialize(QJsonObject obj);//augusto
+	static QJsonObject addEditingUserSerialize(int userId, QString username, QColor userColor, int fileId, int type);
+	static QPair<int, QStringList> addEditingUserUnserialize(QJsonObject obj);
 
-	static QJsonObject removeEditingUserSerialize(int userId, int fileId, int type);//augusto
-	static QPair<int, int> removeEditingUserUnserialize(QJsonObject obj);//augusto
+	static QJsonObject removeEditingUserSerialize(int userId, int fileId, int type);
+	static QPair<int, int> removeEditingUserUnserialize(QJsonObject obj);
 
-	static QJsonObject requestFileList(int type); //augusto
+	static QJsonObject requestFileList(int type);
 
-	static QJsonObject logoutUserSerialize(int type);//augusto
+	static QJsonObject logoutUserSerialize(int type);
 
 	static QByteArray fromObjectToArray(QJsonObject obj);
 	static QJsonObject fromArrayToObject(QByteArray data);
 
 	static QPair<int, int> Serialize::siteCounterUnserialize(QJsonObject obj);
-	//static QJsonObject openDeleteFileSerialize(int fileId, int type); //lorenzo, per la condivisione file
-
-	//void setType(QString type);
-
 
 private:
-	//Ui::SerializeClass ui;
-	//che tipo di oggetto voglio usare viene incapsulato nel json--> login,register,ecc
-	//QString type;
 	static QJsonValue jsonValFromPixmap(const QPixmap& p);
 	static QPixmap pixmapFrom(const QJsonValue& val);
 

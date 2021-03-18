@@ -5,10 +5,7 @@
 Serialize::Serialize(QObject* parent)
 	: QObject(parent)
 {
-	//ui.setupUi(this);
 }
-
-
 
 QJsonObject Serialize::userSerialize(QString user, QString password, QString email, int type, QPixmap* profileImage)
 {
@@ -210,7 +207,6 @@ QPair<int, int> Serialize::closeFileUnserialize(QJsonObject obj) {
 	return res;
 
 }
-
 
 QJsonObject Serialize::openDeleteFileSerialize(int fileId, int type)
 {

@@ -1,4 +1,76 @@
 <RCC>
-    <qresource prefix="Editor">
+    <qresource prefix="/Editor">
+        <file>Icons/001-add.png</file>
+        <file>Icons/002-alphabet.png</file>
+        <file>Icons/003-binoculars.png</file>
+        <file>Icons/004-bold.png</file>
+        <file>Icons/005-quote.png</file>
+        <file>Icons/006-bullet list.png</file>
+        <file>Icons/007-calendar.png</file>
+        <file>Icons/008-clipboard.png</file>
+        <file>Icons/009-code.png</file>
+        <file>Icons/010-command.png</file>
+        <file>Icons/011-copy.png</file>
+        <file>Icons/012-crop.png</file>
+        <file>Icons/013-cut.png</file>
+        <file>Icons/014-delete.png</file>
+        <file>Icons/015-delete.png</file>
+        <file>Icons/016-edit.png</file>
+        <file>Icons/017-eraser.png</file>
+        <file>Icons/018-eye.png</file>
+        <file>Icons/019-eye.png</file>
+        <file>Icons/020-filter.png</file>
+        <file>Icons/021-find.png</file>
+        <file>Icons/022-flip.png</file>
+        <file>Icons/023-flip.png</file>
+        <file>Icons/024-flip.png</file>
+        <file>Icons/025-flip.png</file>
+        <file>Icons/026-font.png</file>
+        <file>Icons/027-font.png</file>
+        <file>Icons/028-font.png</file>
+        <file>Icons/029-hashtag.png</file>
+        <file>Icons/030-highlighter.png</file>
+        <file>Icons/031-italic.png</file>
+        <file>Icons/032-ligature.png</file>
+        <file>Icons/033-link.png</file>
+        <file>Icons/034-link.png</file>
+        <file>Icons/035-maximize.png</file>
+        <file>Icons/036-minimize.png</file>
+        <file>Icons/037-mirror.png</file>
+        <file>Icons/038-number.png</file>
+        <file>Icons/039-omega.png</file>
+        <file>Icons/040-paint bucket.png</file>
+        <file>Icons/041-paint roller.png</file>
+        <file>Icons/042-paperclip.png</file>
+        <file>Icons/043-paragraph.png</file>
+        <file>Icons/044-redo.png</file>
+        <file>Icons/045-search.png</file>
+        <file>Icons/046-search.png</file>
+        <file>Icons/047-search.png</file>
+        <file>Icons/048-shapes.png</file>
+        <file>Icons/049-sigma.png</file>
+        <file>Icons/050-sort.png</file>
+        <file>Icons/051-sort.png</file>
+        <file>Icons/052-square.png</file>
+        <file>Icons/053-strikethrough.png</file>
+        <file>Icons/054-subscript.png</file>
+        <file>Icons/055-superscript.png</file>
+        <file>Icons/056-quote.png</file>
+        <file>Icons/057-underline.png</file>
+        <file>Icons/058-undo.png</file>
+        <file>Icons/059-url.png</file>
+        <file>Icons/060-url.png</file>
+        <file>Icons/center-align.png</file>
+        <file>Icons/export.png</file>
+        <file>Icons/justify.png</file>
+        <file>Icons/left-align.png</file>
+        <file>Icons/list.png</file>
+        <file>Icons/login.png</file>
+        <file>Icons/pdf.png</file>
+        <file>Icons/plus.png</file>
+        <file>Icons/review.png</file>
+        <file>Icons/right-align.png</file>
+        <file>Icons/share.png</file>
+        <file>Icons/user.png</file>
     </qresource>
 </RCC>
