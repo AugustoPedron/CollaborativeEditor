@@ -20,7 +20,6 @@ class NewAccount : public QMainWindow
 
 public:
 	NewAccount(QSharedPointer<SocketHandler> socketHandler, QWidget* parent = Q_NULLPTR);
-	NewAccount(QSharedPointer<SocketHandler> socketHandler, QWidget* parent);
 	~NewAccount();
 
 private:

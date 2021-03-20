@@ -16,6 +16,7 @@ il crdt dovrebbe girare anche sul server --> server ha id == 0 e non crea mai ca
 CRDT::CRDT(int id) :m_senderId(id), m_counter(0)
 {
 	m_symbols.reserve(200000);
+	m_localCursorPos = m_symbols.begin();
 }
 
 
@@ -25,104 +26,134 @@ CRDT::~CRDT()
 //inserimento e cancellazione nelle strutture dati locali sono le remote insert/delete di conclave ossia de messaggi che mi arrivano
 __int64 CRDT::insert_symbol(Symbol symbol)
 {
-	__int64 index = -1;
+	//__int64 index = -1;
 
 
-	if (m_symbols.empty() || symbol.getPos() > m_symbols.back().getPos()) {
-		//inserisco in coda, lo faccio come prima operazione in modo da ottimizzare l'inserimento
-		//quando carico dal server
-		m_symbols.push_back(symbol);
-		index = m_symbols.size() - 1;
+	//if (m_symbols.empty() || symbol.getPos() > m_symbols.back().getPos()) {
+	//	//inserisco in coda, lo faccio come prima operazione in modo da ottimizzare l'inserimento
+	//	//quando carico dal server
+	//	m_symbols.push_back(symbol);
+	//	index = m_symbols.size() - 1;
+	//}
+	//else {
+
+	//	//trovo l'iteratore che punta alla posizione in cui inserire basandomi sulle pos frazionarie
+	//	auto it = std::find_if(m_symbols.begin(), m_symbols.end(), [symbol](Symbol s) {
+
+	//		if (s.getPos() > symbol.getPos())
+	//			return true;
+	//		else if (s.getPos() == symbol.getPos()) {
+
+	//			if (symbol.getId()[0] < s.getId()[0])//vince chi ha il site id minore
+	//				return true;
+	//			else
+	//				return false;
+	//		}
+
+	//		return false;
+	//		});
+
+	//	if (it != m_symbols.end()) {
+
+	//		if (it == m_symbols.begin()) {
+	//			index = 0;
+	//		}
+	//		else {
+
+	//			index = std::distance(m_symbols.begin(), it);//mi dice la posizione del carattere nel crdt ossia dove sono in relazione 
+	//		   //all'inizio della Qstring che rappresenta il testo qui al contarario di prima ritorno solo se ho trovato 
+	//		   //altrimenti non devo fare nulla-->segnalato da -1 che è gestito nel process
+	//		}
+	//		m_symbols.insert(it, symbol);
+
+	//	}
+	//}
+
+	//if ((unsigned)index < m_symbols.size())
+	//	return index;
+	//else
+	//	return (index - 1);//non so se va messo o basta ritornare sempre index fare prove 
+
+	bool endFlag = false;
+	std::vector<Symbol>::iterator it = m_remoteUserCursorPos[symbol.getId()[0]];
+
+	if (it == m_symbols.end()) {
+		endFlag = true;
 	}
-	else {
 
-		//trovo l'iteratore che punta alla posizione in cui inserire basandomi sulle pos frazionarie
-		auto it = std::find_if(m_symbols.begin(), m_symbols.end(), [symbol](Symbol s) {
-
-			if (s.getPos() > symbol.getPos())
-				return true;
-			else if (s.getPos() == symbol.getPos()) {
-
-				if (symbol.getId()[0] < s.getId()[0])//vince chi ha il site id minore
-					return true;
-				else
-					return false;
-			}
-
-			return false;
-			});
-
-		if (it != m_symbols.end()) {
-
-			if (it == m_symbols.begin()) {
-				index = 0;
-			}
-			else {
-
-				index = std::distance(m_symbols.begin(), it);//mi dice la posizione del carattere nel crdt ossia dove sono in relazione 
-			   //all'inizio della Qstring che rappresenta il testo qui al contarario di prima ritorno solo se ho trovato 
-			   //altrimenti non devo fare nulla-->segnalato da -1 che è gestito nel process
-			}
-			m_symbols.insert(it, symbol);
-
-		}
-	}
-
-	if ((unsigned)index < m_symbols.size())
-		return index;
+	m_symbols.insert(it, symbol);
+	if (endFlag)
+		m_remoteUserCursorPos[symbol.getId()[0]] = m_symbols.end();
 	else
-		return (index - 1);//non so se va messo o basta ritornare sempre index fare prove 
+		m_remoteUserCursorPos[symbol.getId()[0]]++;
 }
 
 __int64 CRDT::delete_symbol(Symbol symbol)
 {
-	__int64 index;
+	//__int64 index;
 
-	auto it = std::find_if(m_symbols.begin(), m_symbols.end(),
-		[symbol](Symbol s) {return ((symbol.getId() == s.getId())); });
+	//auto it = std::find_if(m_symbols.begin(), m_symbols.end(),
+	//	[symbol](Symbol s) {return ((symbol.getId() == s.getId())); });
 
-	if (it != m_symbols.end()) {
+	//if (it != m_symbols.end()) {
 
 
-		if (it == m_symbols.begin()) {
-			index = 0;
-		}
-		else {
+	//	if (it == m_symbols.begin()) {
+	//		index = 0;
+	//	}
+	//	else {
 
-			index = std::distance(m_symbols.begin(), it);//mi dice la posizione del carattere nel crdt ossia dove sono in relazione 
-		   //all'inizio della Qstring che rappresenta il testo qui al contarario di prima ritorno solo se ho trovato 
-		   //altrimenti non devo fare nulla-->segnalato da -1 che è gestito nel process
-		}
+	//		index = std::distance(m_symbols.begin(), it);//mi dice la posizione del carattere nel crdt ossia dove sono in relazione 
+	//	   //all'inizio della Qstring che rappresenta il testo qui al contarario di prima ritorno solo se ho trovato 
+	//	   //altrimenti non devo fare nulla-->segnalato da -1 che è gestito nel process
+	//	}
 
-		//vuol dire che l'ho trovato
-		m_symbols.erase(it);
+	//	//vuol dire che l'ho trovato
+	//	m_symbols.erase(it);
 
-		return index;
+	//	return index;
+	//}
+
+	//return -1;
+
+	bool beginFlag = false;
+	std::vector<Symbol>::iterator it = m_remoteUserCursorPos[symbol.getId()[0]];
+
+	if (it == m_symbols.begin()) {
+		beginFlag = true;
 	}
 
-	return -1;
+	m_symbols.erase(--it);
+	if(!beginFlag)
+		m_remoteUserCursorPos[symbol.getId()[0]]--;
 }
 __int64 CRDT::change_symbol(Symbol symbol) {
-	__int64 index;
+	//__int64 index;
 
-	auto it = std::find_if(m_symbols.begin(), m_symbols.end(),
-		[symbol](Symbol s) {return ((s.getPos() == symbol.getPos()) && (symbol.getId() == s.getId())); });
+	//auto it = std::find_if(m_symbols.begin(), m_symbols.end(),
+	//	[symbol](Symbol s) {return ((s.getPos() == symbol.getPos()) && (symbol.getId() == s.getId())); });
 
 
+	//if (it != m_symbols.end()) {
+	//	//vuol dire che l'ho trovato
+	//	(it)->setFont(symbol.getFont());
+	//	(it)->setColor(symbol.getColor());
+	//	(it)->setAlignment(symbol.getAlignment());
+
+	//	index = std::distance(m_symbols.begin(), it);
+
+
+	//	return index;
+	//}
+
+	//return -1;
+
+	std::vector<Symbol>::iterator it = m_remoteUserCursorPos[symbol.getId()[0]];
 	if (it != m_symbols.end()) {
-		//vuol dire che l'ho trovato
 		(it)->setFont(symbol.getFont());
 		(it)->setColor(symbol.getColor());
 		(it)->setAlignment(symbol.getAlignment());
-
-		index = std::distance(m_symbols.begin(), it);
-
-
-		return index;
 	}
-
-	return -1;
-
 }
 
 __int64 CRDT::process(const Message& m)
@@ -507,17 +538,15 @@ Cursor CRDT::getCursorPosition(int index) {
 		return Cursor(m_senderId, m_symbols.at(index).getPos());
 }
 
-__int64 CRDT::getCursorPosition(std::vector<int> crdtPos) {
-	__int64 index = -1;
-
+std::vector<Symbol>::iterator CRDT::getCursorPosition(std::vector<int> crdtPos) {
 
 	if (m_symbols.empty()) {
 		//inserisco in coda, lo faccio come prima operazione in modo da ottimizzare l'inserimento
 		//quando carico dal server
-		index = 0;
+		return m_symbols.begin();
 	}
 	else if (crdtPos > m_symbols.back().getPos()) {
-		index = m_symbols.size();
+		return m_symbols.end();
 	}
 	else {
 
@@ -526,31 +555,18 @@ __int64 CRDT::getCursorPosition(std::vector<int> crdtPos) {
 
 			if (s.getPos() >= crdtPos)
 				return true;
-			/*else if (s.getPos() == crdtPos) {
-
-				if (symbol.getId()[0] < s.getId()[0])//vince chi ha il site id minore
-					return true;
-				else
-					return false;
-			}*/
 
 			return false;
 			});
 
-		if (it != m_symbols.end()) {
-
-			index = std::distance(m_symbols.begin(), it);//mi dice la posizione del carattere nel crdt ossia dove sono in relazione 
-		   //all'inizio della Qstring che rappresenta il testo qui al contarario di prima ritorno solo se ho trovato 
-		   //altrimenti non devo fare nulla-->segnalato da -1 che è gestito nel process
-
-
-		}
+		return it;
 	}
+}
 
-	if ((unsigned)index <= m_symbols.size())
-		return index;
-	else
-		return (index - 1);//non so se va messo o basta ritornare sempre index fare prove 
+__int64 CRDT::convertIteratorToIntPos(std::vector<Symbol>::iterator it) {
+	if (it == m_symbols.begin()) return 0;
+	if (it == m_symbols.end()) return m_symbols.size();
+	return  std::distance(m_symbols.begin(), it);
 }
 
 void CRDT::updateUserInterval() {
@@ -586,4 +602,17 @@ void CRDT::updateUserInterval() {
 
 void CRDT::setSiteCounter(int siteCounter) {
 	m_counter = siteCounter;
+}
+
+void CRDT::addRemoteUser(int userId, std::vector<int> pos) {
+	m_remoteUserCursorPos.insert(std::pair<int, std::vector<Symbol>::iterator>(userId, getCursorPosition(pos)));
+}
+
+void CRDT::updateRemoteUserPos(int userId, std::vector<int> pos) {
+	m_remoteUserCursorPos[userId] = getCursorPosition(pos);
+}
+
+void CRDT::updateLocalUserPos(int index) {
+	if (index > m_symbols.size()) m_localCursorPos = m_symbols.end();
+	else m_localCursorPos = m_symbols.begin() + index;
 }

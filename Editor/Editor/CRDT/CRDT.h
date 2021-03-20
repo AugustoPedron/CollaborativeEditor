@@ -22,6 +22,8 @@ private:
 	int m_counter;
 	std::vector<Symbol> m_symbols;
 	std::vector<UserInterval> m_usersInterval;
+	std::map<int, std::vector<Symbol>::iterator> m_remoteUserCursorPos;
+	std::vector<Symbol>::iterator m_localCursorPos;
 	//uso __int64 per evitare warning e perdita dati per troncamento
 	__int64 insert_symbol(Symbol symbol);
 	__int64 delete_symbol(Symbol symbol);
@@ -36,12 +38,10 @@ public:
 	Message localErase(int index);
 	Message localChange(int index, char value, QFont font, const QColor color, Qt::AlignmentFlag alignment);
 
-	__int64 process(const Message& m);
-	std::string to_string();//usare Qstring??
 	int getId();
 	Symbol getSymbol(int index);
-	//SERVER ONLY
-	//void dispatchMessages();-->sul server
+	__int64 process(const Message& m);
+	std::string to_string();//usare Qstring??
 	std::vector<Message> getMessageArray();//SERVER ONLY-->questo vettore va mandato con un for ai socket con all'interno un serializzatore mando i messaggi uno alla volta
 	std::vector<Message> readFromFile(std::string fileName);
 	void saveOnFile(std::string filename);//versione base salva solo i caratteri e non il formato--> da testare
@@ -51,7 +51,11 @@ public:
 	void setSiteCounter(int siteCounter);
 	inline int getSiteCounter() { return m_counter; };
 	Cursor getCursorPosition(int index);
-	__int64 getCursorPosition(std::vector<int> crdtPos);
+	std::vector<Symbol>::iterator getCursorPosition(std::vector<int> crdtPos);
+	__int64 convertIteratorToIntPos(std::vector<Symbol>::iterator it);
+	void addRemoteUser(int userId, std::vector<int> pos);
+	void updateRemoteUserPos(int userId, std::vector<int> pos);
+	void updateLocalUserPos(int index);
 
 	//for fractional position debug only
 	void printPositions()

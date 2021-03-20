@@ -91,8 +91,8 @@ void NewAccount::on_submit_clicked() {
 	QString email = ui.emailLine->text();
 	if (username != "" && email != "") {
 		if (password.compare(password_re) == 0) {
-			QJsonObject userInfoSerialized = m_serializeInstance->userSerialize(username, password, email, REGISTER, m_croppedImage); //ilio
-			//bool result = m_socketHandler->writeData(m_serializeInstance->fromObjectToArray(userInfoSerialized));
+			QByteArray userInfoSerialized = m_serializeInstance->userSerialize(username, password, email, REGISTER, m_croppedImage); //ilio
+			//bool result = m_socketHandler->writeData(userInfoSerialized);
 			//if (result) {
 			//	m_timer->setSingleShot(true);
 			//	m_timer->setInterval(4000);
@@ -104,7 +104,7 @@ void NewAccount::on_submit_clicked() {
 			//	resultDialog.setInformativeText("Errore di connessione");
 			//	resultDialog.exec();
 			//}
-			emit dataToSend(m_serializeInstance->fromObjectToArray(userInfoSerialized));
+			emit dataToSend(userInfoSerialized);
 			//if (m_croppedImage != Q_NULLPTR) {
 			//	QPoint areaPos = m_selectionArea->geometry().topLeft();
 			//	areaPos.setX(areaPos.x() - ui.imageLabel->pos().x());
