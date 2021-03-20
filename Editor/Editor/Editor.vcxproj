@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CRDT\CRDT.h" />
+    <ClInclude Include="CRDT\Cursor.h" />
     <ClInclude Include="CRDT\Message.h" />
     <ClInclude Include="CRDT\Symbol.h" />
     <ClInclude Include="Editor\UserInterval.h" />
@@ -33,6 +34,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CRDT\CRDT.cpp" />
+    <ClCompile Include="CRDT\Cursor.cpp" />
     <ClCompile Include="CRDT\Message.cpp" />
     <ClCompile Include="CRDT\Symbol.cpp" />
     <ClCompile Include="CropDialog\CropDialog.cpp" />

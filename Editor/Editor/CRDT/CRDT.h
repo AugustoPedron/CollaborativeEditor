@@ -7,21 +7,20 @@
 
 #include "Symbol.h"
 #include "Message.h"
+#include "Cursor.h"
 #include "../Editor/UserInterval.h"
 
 #define INSERT 0
 #define DELETE_S 1
 #define CHANGE 2
-#define CURSOR_S 3
-class Message;
 
 class CRDT
 {
 private:
 
-	int _siteId;
-	int _counter;
-	std::vector<Symbol> _symbols;
+	int m_senderId;
+	int m_counter;
+	std::vector<Symbol> m_symbols;
 	std::vector<UserInterval> m_usersInterval;
 	//uso __int64 per evitare warning e perdita dati per troncamento
 	__int64 insert_symbol(Symbol symbol);
@@ -50,14 +49,14 @@ public:
 	void updateUserInterval();
 	inline std::vector<UserInterval>* getUsersInterval() { return &m_usersInterval; };
 	void setSiteCounter(int siteCounter);
-	inline int getSiteCounter() { return this->_counter; };
-
+	inline int getSiteCounter() { return m_counter; };
+	Cursor getCursorPosition(int index);
 	__int64 getCursorPosition(std::vector<int> crdtPos);
 
 	//for fractional position debug only
 	void printPositions()
 	{
-		for (Symbol s : _symbols) {
+		for (Symbol s : m_symbols) {
 
 			std::vector<int> dv = s.getPos();
 			for (int d : dv)

@@ -25,9 +25,11 @@ class ModifyProfile : public QMainWindow
 
 public:
 	ModifyProfile(QSharedPointer<SocketHandler> socketHandler, QString username, QString email, QSharedPointer<QPixmap> profileImage, QMainWindow* parent = Q_NULLPTR);
+	ModifyProfile(QSharedPointer<SocketHandler> socketHandler, QString username, QString email, QSharedPointer<QPixmap> profileImage, QMainWindow* parent);
 	~ModifyProfile();
 
 private:
+	Serialize* m_serializeInstance;
 	Ui::ModifyProfile ui;
 	QSharedPointer<SocketHandler> m_socketHandler;
 	QTimer* m_timer;

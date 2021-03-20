@@ -20,9 +20,11 @@ class NewAccount : public QMainWindow
 
 public:
 	NewAccount(QSharedPointer<SocketHandler> socketHandler, QWidget* parent = Q_NULLPTR);
+	NewAccount(QSharedPointer<SocketHandler> socketHandler, QWidget* parent);
 	~NewAccount();
 
 private:
+	Serialize* m_serializeInstance;
 	QSharedPointer<SocketHandler> m_socketHandler;
 	QTimer* m_timer;
 	Ui::NewAccount ui;

@@ -6,10 +6,6 @@ Symbol::Symbol(char character, std::array<int, 2> id, std::vector<int> vett, QFo
 {
 }
 
-Symbol::Symbol(std::vector<int> vett): position(vett)
-{
-}
-
 Symbol::Symbol()
 {
 }

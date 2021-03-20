@@ -11,7 +11,6 @@
 #include <Qdebug>
 #include <QTextCharFormat>
 
-
 #include <chrono>
 #include <thread>
 
@@ -29,40 +28,23 @@ Editor::Editor(QSharedPointer<SocketHandler> socketHandler, QSharedPointer<QPixm
 	m_profileImage(profileImage), m_userColor(userColor), ID(clientID), filePath(path), parent(parent)
 {
 	ui.setupUi(this);
-	this->_CRDT = new CRDT(this->ID);//METTERE L'ID DATO DAL SERVER!!!!!!!!!!!!!!!!!
+	m_CRDT = new CRDT(this->ID);
+	m_SerializeInstance = m_SerializeInstance->getInstance();
 
-	m_textEdit = new MyTextEdit(this->_CRDT, this);
+	m_textEdit = new MyTextEdit(m_CRDT, this);
 	ui.gridLayout->addWidget(m_textEdit);
 	m_textEdit->setStyleSheet("QTextEdit { padding-left:10; padding-top:10; padding-bottom:10; padding-right:10}");
 	m_textEdit->setMouseTracking(true);
 	this->setWindowTitle(path);
-	//m_textEdit->setText(path);
 	createActions();
-	//this->loadFile(this->filePath);
 	setCurrentFile(path);
 	QTextCursor TC = m_textEdit->textCursor();
-	//TC.setPosition(0);
-	//m_textEdit->setTextCursor(TC);
 	setCurrentFile(QString());
 	setUnifiedTitleAndToolBarOnMac(true);
 
-	connect(m_textEdit, &QTextEdit::cursorPositionChanged, this, &Editor::on_textEdit_cursorPositionChanged);
-	connect(m_textEdit, &MyTextEdit::clickOnTextEdit, this, &Editor::mousePressEvent);
-	connect(m_textEdit, &MyTextEdit::updateCursorPosition, this, &Editor::updateCursorPosition);
-	connect(m_textEdit, &MyTextEdit::updateLocalCursorAfterInsert, this, &Editor::updateLocalCursorAfterInsert);
-	connect(m_textEdit, &MyTextEdit::updateLocalCursorAfterDelete, this, &Editor::updateLocalCursorAfterDelete);
-	connect(this, &Editor::dataToSend, m_socketHandler.get(), &SocketHandler::writeData, Qt::QueuedConnection);
 	this->setFocusPolicy(Qt::StrongFocus);
-
-	(connect(m_textEdit, SIGNAL(propaga(QKeyEvent*)), this, SLOT(tastoPremuto(QKeyEvent*))));
-
 	this->alignmentChanged(this->m_textEdit->alignment());
 	this->colorChanged(this->m_textEdit->textColor());
-
-	//MATTIA--------------------------------------------------------------------------------------
-	connect(m_textEdit, &QTextEdit::cursorPositionChanged, this, &Editor::updateLastPosition);
-	//trigger stylechange
-	Q_ASSERT(connect(this, &Editor::styleChange, this, &Editor::localStyleChange));
 
 	this->remoteEvent = false;
 	lastCursor = 0;
@@ -72,71 +54,70 @@ Editor::Editor(QSharedPointer<SocketHandler> socketHandler, QSharedPointer<QPixm
 	this->insert_timer = new QTimer(this);
 	this->insert_timer->setSingleShot(true);
 	this->insert_timer->setInterval(TIMER_TIME);
-	Q_ASSERT(connect(this->insert_timer, SIGNAL(timeout()), this, SLOT(insertCharBatch())));
-	//FINE----------------------------------------------------------------------------------
 
-#ifdef Q_OS_MACOS
-	// Use dark text on light background on macOS, also in dark mode.
-	QPalette pal = this->m_textEdit->palette();
-	pal.setColor(QPalette::Base, QColor(Qt::white));
-	pal.setColor(QPalette::Text, QColor(Qt::black));
-	this->m_textEdit->setPalette(pal);
-#endif
+	connect(m_textEdit, &QTextEdit::cursorPositionChanged, this, &Editor::on_textEdit_cursorPositionChanged);
+	connect(m_textEdit, &MyTextEdit::clickOnTextEdit, this, &Editor::mousePressEvent);
+	connect(m_textEdit, &MyTextEdit::updateCursorPosition, this, &Editor::updateCursorPosition);
+	connect(m_textEdit, &MyTextEdit::updateLocalCursorAfterInsert, this, &Editor::updateLocalCursorAfterInsert);
+	connect(m_textEdit, &MyTextEdit::updateLocalCursorAfterDelete, this, &Editor::updateLocalCursorAfterDelete);
+	connect(m_textEdit, &QTextEdit::copyAvailable, copyAct, &QAction::setEnabled);
+	connect(m_textEdit, &QTextEdit::cursorPositionChanged, this, &Editor::updateLastPosition);
+	connect(m_textEdit, SIGNAL(propaga(QKeyEvent*)), this, SLOT(tastoPremuto(QKeyEvent*)));
+	connect(this, &Editor::dataToSend, m_socketHandler.get(), &SocketHandler::writeData, Qt::QueuedConnection);
+	connect(this, &Editor::styleChange, this, &Editor::localStyleChange);
+	connect(this->insert_timer, SIGNAL(timeout()), this, SLOT(insertCharBatch()));
 }
 
 Editor::~Editor()
 {
-	//MATTIA-----------------
-	delete this->_CRDT;
-	this->_CRDT = nullptr;
-	//FINE---------------------
+	delete m_CRDT;
+	m_CRDT = nullptr;
 }
 
 int Editor::getSiteCounter_()
 {
-	return this->_CRDT->getSiteCounter();
+	return m_CRDT->getSiteCounter();
 }
 
 void Editor::closeEvent(QCloseEvent* event) {
-	emit editorClosed(m_fileId, this->_CRDT->getSiteCounter());
+	emit editorClosed(m_fileId, m_CRDT->getSiteCounter());
 	this->close();
 }
 
 void Editor::loadFile(const QString& fileName) {
-	//il file andrà caricato con quello inviato dal server
-	QFile file(fileName);
-	if (!file.open(QFile::ReadOnly | QFile::Text)) {
-		QMessageBox::warning(this, tr("Application"),
-			tr("Cannot read file %1:\n%2.").arg(QDir::toNativeSeparators(fileName), file.errorString()));
-		return;
-	}
-
-	QTextStream in(&file);
-#ifndef QT_NO_CURSOR
-	QApplication::setOverrideCursor(Qt::WaitCursor);
-#endif
-	QString temp = in.readAll();
-	m_textEdit->setPlainText(temp);
-	m_timer->setSingleShot(true);
-	m_timer->setInterval(2000);
-	m_timer->start();
-
-	//va fatta la lettura del file per il CRDT
-	//QChar currentChar = textEdit.at
-#ifndef QT_NO_CURSOR
-	QApplication::restoreOverrideCursor();
-#endif
-
-	setCurrentFile(fileName);
-	//statusBar()->showMessage(tr("File loaded"), 2000);
+//	QFile file(fileName);
+//	if (!file.open(QFile::ReadOnly | QFile::Text)) {
+//		QMessageBox::warning(this, tr("Application"),
+//			tr("Cannot read file %1:\n%2.").arg(QDir::toNativeSeparators(fileName), file.errorString()));
+//		return;
+//	}
+//
+//	QTextStream in(&file);
+//#ifndef QT_NO_CURSOR
+//	QApplication::setOverrideCursor(Qt::WaitCursor);
+//#endif
+//	QString temp = in.readAll();
+//	m_textEdit->setPlainText(temp);
+//	m_timer->setSingleShot(true);
+//	m_timer->setInterval(2000);
+//	m_timer->start();
+//
+//	//va fatta la lettura del file per il CRDT
+//	//QChar currentChar = textEdit.at
+//#ifndef QT_NO_CURSOR
+//	QApplication::restoreOverrideCursor();
+//#endif
+//
+//	setCurrentFile(fileName);
+//	//statusBar()->showMessage(tr("File loaded"), 2000);
 }
 
 void Editor::open() {
-	if (maybeSave()) {
-		QString fileName = QFileDialog::getOpenFileName(this);
-		if (!fileName.isEmpty())
-			loadFile(fileName);
-	}
+	//if (maybeSave()) {
+	//	QString fileName = QFileDialog::getOpenFileName(this);
+	//	if (!fileName.isEmpty())
+	//		loadFile(fileName);
+	//}
 }
 
 void Editor::setCurrentFile(const QString& fileName) {
@@ -151,22 +132,22 @@ void Editor::setCurrentFile(const QString& fileName) {
 }
 
 bool Editor::maybeSave() {
-	if (!m_textEdit->document()->isModified())
-		return true;
-	const QMessageBox::StandardButton ret
-		= QMessageBox::warning(this, tr("Application"),
-			tr("The document has been modified.\n"
-				"Do you want to save your changes?"),
-			QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-	switch (ret) {
-	case QMessageBox::Save:
-		//return save();
-	case QMessageBox::Cancel:
-		return false;
-	default:
-		break;
-	}
-	return true;
+	//if (!m_textEdit->document()->isModified())
+	//	return true;
+	//const QMessageBox::StandardButton ret
+	//	= QMessageBox::warning(this, tr("Application"),
+	//		tr("The document has been modified.\n"
+	//			"Do you want to save your changes?"),
+	//		QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+	//switch (ret) {
+	//case QMessageBox::Save:
+	//	//return save();
+	//case QMessageBox::Cancel:
+	//	return false;
+	//default:
+	//	break;
+	//}
+	//return true;
 }
 
 void Editor::createActions() {
@@ -234,17 +215,6 @@ void Editor::createActions() {
 	ui.menuFile->addAction(this->shareAct);
 	connect(this->shareAct, &QAction::triggered, this, &Editor::shareLink);
 
-
-	//const QIcon undoIcon = QIcon::fromTheme("edit-undo", QIcon("./Icons/058-undo.png"));
-	//this->actionUndo = ui.menuModifica->addAction(undoIcon, tr("&Undo"), m_textEdit, &QTextEdit::undo);
-	//this->actionUndo->setShortcut(QKeySequence::Undo);
-	//ui.toolBar->addAction(this->actionUndo);
-
-	//const QIcon redoIcon = QIcon::fromTheme("edit-redo", QIcon("./Icons/044-redo.png"));
-	//this->actionRedo = ui.menuModifica->addAction(redoIcon, tr("&Redo"), m_textEdit, &QTextEdit::redo);
-	//this->actionRedo->setShortcut(QKeySequence::Redo);
-	//ui.toolBar->addAction(this->actionRedo);
-
 	this->italicAct = new QAction(QIcon("./Icons/031-italic.png"), tr("&Corsivo"), this);
 	this->italicAct->setCheckable(true);
 	this->italicAct->setChecked(false);
@@ -254,7 +224,6 @@ void Editor::createActions() {
 	ui.menuModifica->addAction(this->italicAct);
 	ui.toolBar->addAction(this->italicAct);
 
-
 	this->boldAct = new QAction(QIcon("./Icons/004-bold.png"), tr("&Grassetto"), this);
 	this->boldAct->setCheckable(true);
 	this->boldAct->setPriority(QAction::LowPriority);
@@ -263,7 +232,6 @@ void Editor::createActions() {
 	ui.menuModifica->addAction(this->boldAct);
 	ui.toolBar->addAction(this->boldAct);
 
-	//const QIcon underlineIcon = QIcon::fromTheme("format-text-underline", QIcon(rsrcPath + "/textunder.png"));
 	this->underLineAct = new QAction(QIcon("./Icons/057-underline.png"), tr("&Sottilinea"), this);
 	this->underLineAct->setShortcut(Qt::CTRL + Qt::Key_U);
 	this->underLineAct->setPriority(QAction::LowPriority);
@@ -272,33 +240,9 @@ void Editor::createActions() {
 	this->underLineAct->setCheckable(true);
 	connect(this->underLineAct, &QAction::triggered, this, &Editor::makeUnderlined);
 
-	//this->actionImage = new QAction(cutIcon, tr("&Inserisci immagine"), this);
-	//ui.menuModifica->addAction(this->actionImage);
-	//ui.toolBar->addAction(this->actionImage);
-	//connect(this->actionImage, &QAction::triggered, this, &Editor::insertImage);
-
 	ui.toolBar = addToolBar(tr("Format Actions"));
 	addToolBarBreak(Qt::TopToolBarArea);
 	addToolBar(ui.toolBar);
-
-	/*this->comboStyle = new QComboBox(ui.toolBar);
-	ui.toolBar->addWidget(comboStyle);
-	this->comboStyle->addItem("Standard");
-	this->comboStyle->addItem("Bullet List (Disc)");
-	this->comboStyle->addItem("Bullet List (Circle)");
-	this->comboStyle->addItem("Bullet List (Square)");
-	this->comboStyle->addItem("Ordered List (Decimal)");
-	this->comboStyle->addItem("Ordered List (Alpha lower)");
-	this->comboStyle->addItem("Ordered List (Alpha upper)");
-	this->comboStyle->addItem("Ordered List (Roman lower)");
-	this->comboStyle->addItem("Ordered List (Roman upper)");
-	this->comboStyle->addItem("Heading 1");
-	this->comboStyle->addItem("Heading 2");
-	this->comboStyle->addItem("Heading 3");
-	this->comboStyle->addItem("Heading 4");
-	this->comboStyle->addItem("Heading 5");
-	this->comboStyle->addItem("Heading 6");
-	connect(this->comboStyle, QOverload<int>::of(&QComboBox::activated), this, &Editor::textStyle);*/
 
 	this->comboFont = new QFontComboBox(ui.toolBar);
 	ui.toolBar->addWidget(this->comboFont);
@@ -322,10 +266,7 @@ void Editor::createActions() {
 	ui.toolBar->addAction(actionTextColor);
 
 #ifndef QT_NO_CLIPBOARD
-	//cutAct->setEnabled(false);
 	copyAct->setEnabled(false);
-	//connect(m_textEdit, &QTextEdit::canPaste, cutAct, &QAction::setEnabled);
-	connect(m_textEdit, &QTextEdit::copyAvailable, copyAct, &QAction::setEnabled);
 #endif // !QT_NO_CLIPBOARD
 
 	//const QIcon leftIcon = QIcon::fromTheme("format-justify-left", QIcon(rsrcPath + "/textleft.png"));
@@ -415,8 +356,6 @@ void Editor::makeUnderlined() {
 	m_textEdit->setFocus();
 	emit styleChange();
 }
-
-
 
 void Editor::textStyle(int styleIndex)
 {
@@ -570,74 +509,16 @@ void Editor::filePrintPdf() {
 //funzione atta a creare un link per la condivisione di un file, da connettere al tasto share
 void Editor::shareLink() {
 	
-	QJsonObject obj = Serialize::openDeleteFileSerialize(m_fileId, SHARE);
-	QByteArray msg = Serialize::fromObjectToArray(obj);
-	//if (m_socketHandler->writeData(msg) == false) {
-	//	return;
-	//}
+	QJsonObject obj = m_SerializeInstance->openDeleteFileSerialize(m_fileId, SHARE);
+	QByteArray msg = m_SerializeInstance->fromObjectToArray(obj);
 	m_textEdit->setFocus();
 	emit dataToSend(msg);
 
 }
 
-//MATTIA-----------------------------------------------------------------------------------------------------------
-
 void Editor::on_textEdit_textChanged() {
 
-	//QTextCursor TC = m_textEdit->textCursor();
-	//QString temp = m_textEdit->toPlainText();
-	//int pos = TC.position();
-	//char chr;
-	//
-	//if(TC.position()==0)
-	//	chr = m_textEdit->toPlainText().at(TC.position()).toLatin1();
-	//else
-	//	chr = m_textEdit->toPlainText().at(TC.position()-1).toLatin1();
-	//FormatStructure FS;
-	//FS.isUnderlined = TC.charFormat().fontUnderline();
-	//FS.isItalic = TC.charFormat().fontItalic();
-	//FS.weight = TC.charFormat().fontWeight();
-	//FS.size = TC.charFormat().fontPointSize();
-	//FS.font = TC.charFormat().fontFamily();
-
-
-	//il messaggio va mandato al serializzatore
-
-	//if (this->remoteEvent)//old verion --->sostituito da connect e disconnect dell' textchange
-	//	return;
-
-	//if (this->styleBounce) {
-	//	this->styleBounce = false;
-	//	return;
-	//}
-
-	//QTextCursor TC = m_textEdit->textCursor();
-
-
-
-	////DEBUG
-	//int curr = TC.position();
-	//int last = this->lastCursor;
-	//if (this->lastText.compare(this->m_textEdit->toPlainText()) == 0) {// se non è insert o delete--> change in the format
-	//	//this->localStyleChange();
-	//	////aggiorno
-	//	this->lastText = m_textEdit->toPlainText();
-	//	this->lastCursor = TC.position();
-	//
-	//}
-
-	//old version noe we use KeyEvent
-	//else if (TC.position() <= lastCursor) {
-	//	//è una delete		
-	//	localDelete();
-	//}
-	//else {
-	//	//è una insert
-	//	localInsert();
-	//}
-
 }
-
 
 void Editor::localInsert() {
 	QTextCursor TC = m_textEdit->textCursor();
@@ -664,16 +545,16 @@ void Editor::localInsert() {
 		QColor color = format.foreground().color();
 		Qt::AlignmentFlag alignment = this->getAlignementFlag(m_textEdit->alignment());
 
-		Message m = this->_CRDT->localInsert(pos, chr, font, color, alignment);
-		QJsonObject packet = Serialize::messageSerialize(m, m_fileId, MESSAGE);
+		Message m = m_CRDT->localInsert(pos, chr, font, color, alignment);
+		QJsonObject packet = m_SerializeInstance->messageSerialize(m, m_fileId, MESSAGE);
 
 
 		//mandare solo un tot alla volta--> 50 caratteri e poi sleep per tot millisecondi
 		maybeSleep(dim);
 		dim--;
 
-		//m_socketHandler->writeData(Serialize::fromObjectToArray(packet)); // -> socket
-		emit dataToSend(Serialize::fromObjectToArray(packet));
+		//m_socketHandler->writeData(m_SerializeInstance->fromObjectToArray(packet)); // -> socket
+		emit dataToSend(m_SerializeInstance->fromObjectToArray(packet));
 
 		//std::string prova = m.getSymbol().getFont().toString().toStdString();
 		//std::cout << "prova" << std::endl;
@@ -690,7 +571,7 @@ void Editor::localInsert() {
 	if (SB != Q_NULLPTR) {
 		SB->setValue(sbPos);
 	}
-	this->_CRDT->updateUserInterval();
+	m_CRDT->updateUserInterval();
 	emit updateUsersIntervals();
 }
 
@@ -721,15 +602,15 @@ void Editor::localDelete() {
 
 	for (int i = end; i > start; i--) {
 
-		Message m = this->_CRDT->localErase(i - 1);
-		QJsonObject packet = Serialize::messageSerialize(m, m_fileId, MESSAGE);
+		Message m = m_CRDT->localErase(i - 1);
+		QJsonObject packet = m_SerializeInstance->messageSerialize(m, m_fileId, MESSAGE);
 
 
 		maybeSleep(dim);
 		dim--;
 
-		//m_socketHandler->writeData(Serialize::fromObjectToArray(packet)); // -> socket
-		emit dataToSend(Serialize::fromObjectToArray(packet));
+		//m_socketHandler->writeData(m_SerializeInstance->fromObjectToArray(packet)); // -> socket
+		emit dataToSend(m_SerializeInstance->fromObjectToArray(packet));
 	}
 
 	QScrollBar* SB = m_textEdit->verticalScrollBar();
@@ -741,37 +622,11 @@ void Editor::localDelete() {
 	if (SB != Q_NULLPTR) {
 		SB->setValue(sbPos);
 	}
-	this->_CRDT->updateUserInterval();
+	m_CRDT->updateUserInterval();
 	emit updateUsersIntervals();
 
 	this->lastEnd = this->lastStart;
-
-
-	//this->lastStart = 0;
-	//this -> lastEnd = 0;
-	//for (int i = lastCursor; i > TC.position(); i--) {
-	//	Message m = this->_CRDT->localErase(i - 1);
-	//	//send to socket
-
-	//}
-	//if (lastCursor == TC.position()) {//se sono uguale sono nel caso particolare in cui seeziono da dx a sx
-	//								// e quando cancello il cursore non cambia
-	//	deleteDxSx();
-	//}
-
 }
-
-//
-//void Editor::deleteDxSx() {
-//
-//	QTextCursor TC = m_textEdit->textCursor();
-//	int start = this->lastStart;
-//	int end = this->lastEnd;
-//	for (int i = end; i > start; i--) {
-//		Message m = this->_CRDT->localErase(i - 1);
-//		//send to socketaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-//	}
-//}
 
 void Editor::remoteAction(Message m)
 {
@@ -779,7 +634,7 @@ void Editor::remoteAction(Message m)
 	//provato anche con connect e disconnect del segnale 
 
 	//inserisce auth nel CRDT
-	__int64 index = this->_CRDT->process(m);//index rappresenta l'indice della lettere nel testo corrente dove fare insert/delete
+	__int64 index = m_CRDT->process(m);//index rappresenta l'indice della lettere nel testo corrente dove fare insert/delete
 
 	/*--------------------------------------------------------------------------------
 	queste due funzioni in base al valore dell'indice a cui inserire e a quello del cursore corrente decidono
@@ -788,27 +643,11 @@ void Editor::remoteAction(Message m)
 	-- iff this<last
 	solo se sto inserendo ad un indice inferiore a quello a cui sto srivendo poiche avrò un char in meno o in piu
 	-----------------------------------------------------------------------------------------*/
-	//switch (m.getAction()) {
-	//case INSERT:
-	//	updateViewAfterInsert(m, index);
-	//	maybeincrement(index);
-	//	break;
-	//case DELETE_S:
-	//	updateViewAfterDelete(m, index);
-	//	maybedecrement(index);
-	//	break;
-	//case CHANGE:
-	//	updateViewAfterStyleChange(m, index);
-	//	break;
-	//default:
-	//	break;
-	//}
 	QTextCursor TC = m_textEdit->textCursor();
 	int pos = TC.position();
 
 	disconnect(m_textEdit, &QTextEdit::textChanged, this, &Editor::on_textEdit_textChanged);
 	disconnect(m_textEdit, &QTextEdit::cursorPositionChanged, this, &Editor::on_textEdit_cursorPositionChanged);
-	//m_textEdit->handleMessage(m.getSenderId(), m, index); //gestione dei messaggi remoti spostata in CustomCursor
 	int userId = m.getSenderId();
 	if (userId == -1)
 		initialFileLoad(m, index);
@@ -821,7 +660,7 @@ void Editor::remoteAction(Message m)
 
 		pos > index ? pos++ : pos = pos;
 
-		this->_CRDT->updateUserInterval();
+		m_CRDT->updateUserInterval();
 		emit updateUsersIntervals();
 
 		break;
@@ -830,7 +669,7 @@ void Editor::remoteAction(Message m)
 
 		pos > index ? pos-- : pos = pos;
 
-		this->_CRDT->updateUserInterval();
+		m_CRDT->updateUserInterval();
 		emit updateUsersIntervals();
 
 		break;
@@ -1102,7 +941,7 @@ void Editor::localStyleChange()
 		Qt::AlignmentFlag alignment = this->getAlignementFlag(m_textEdit->alignment());
 
 
-		Symbol s = this->_CRDT->getSymbol(pos);
+		Symbol s = m_CRDT->getSymbol(pos);
 
 		maybeSleep(dim);
 		dim--;
@@ -1110,10 +949,10 @@ void Editor::localStyleChange()
 		if (s.getAlignment() != alignment || s.getColor() != color || s.getFont() != font) {
 
 			//scrivo sul socket solo se c'e stato un vero cambio --> meno banda e carico per il server
-			Message m = this->_CRDT->localChange(pos, chr, font, color, alignment);
-			QJsonObject packet = Serialize::messageSerialize(m, m_fileId, MESSAGE);
-			//m_socketHandler->writeData(Serialize::fromObjectToArray(packet)); // -> socket
-			emit dataToSend(Serialize::fromObjectToArray(packet));
+			Message m = m_CRDT->localChange(pos, chr, font, color, alignment);
+			QJsonObject packet = m_SerializeInstance->messageSerialize(m, m_fileId, MESSAGE);
+			//m_socketHandler->writeData(m_SerializeInstance->fromObjectToArray(packet)); // -> socket
+			emit dataToSend(m_SerializeInstance->fromObjectToArray(packet));
 		}
 
 	}
@@ -1143,7 +982,7 @@ void Editor::tastoPremuto(QKeyEvent* e)
 	start = end = 0;
 	//incolla
 	if (e->matches(QKeySequence::Paste)) {
-		if (this->lastStart != this->lastEnd && !this->_CRDT->isEmpty()) {
+		if (this->lastStart != this->lastEnd && !m_CRDT->isEmpty()) {
 			//
 
 			start = this->lastStart;
@@ -1187,7 +1026,7 @@ void Editor::tastoPremuto(QKeyEvent* e)
 	case Qt::Key_Delete:
 
 		this->localDelete();
-		if (this->_CRDT->isEmpty())
+		if (m_CRDT->isEmpty())
 			this->lastStart = this->lastEnd = 0;
 		break;
 	case Qt::Key_Alt:	
@@ -1202,7 +1041,7 @@ void Editor::tastoPremuto(QKeyEvent* e)
 		if ((e->text() == "") || (isAKeySequence(e)))//questa funzione ritorna una stringa vuota se non è un carattre alfanumerico ed esce se uno shortcut tra quelli inseriti nella funzione
 			break;
 
-		if (start != end && !this->_CRDT->isEmpty()) {
+		if (start != end && !m_CRDT->isEmpty()) {
 			this->lastStart = start;
 			this->lastEnd = end;
 
@@ -1217,7 +1056,7 @@ void Editor::tastoPremuto(QKeyEvent* e)
 	m_textEdit->setTextCursor(TC);
 	this->lastText = m_textEdit->toPlainText();
 	this->lastCursor = this->m_textEdit->textCursor().position();
-	this->_CRDT->printPositions();
+	m_CRDT->printPositions();
 }
 
 
@@ -1234,7 +1073,7 @@ void Editor::insertImage() {
 		imageFormat.setHeight(image.height());
 		imageFormat.setName(uri.toString());
 		cursor.insertImage(imageFormat);
-		QJsonObject imageSerialized = Serialize::imageSerialize(image, 2);
+		QJsonObject imageSerialized = m_SerializeInstance->imageSerialize(image, 2);
 		//serve un messaggio che abbia anche la posizione del cursore per l'immagine, oltre che il ridimensionamento
 	}
 }
@@ -1297,61 +1136,19 @@ void Editor::styleChanged(QFont font){
 
 void Editor::on_textEdit_cursorPositionChanged() {
 	this->alignmentChanged(m_textEdit->alignment());
-	
-	/*this->styleChanged(m_textEdit->font());*/
 
 	QTextCursor TC = m_textEdit->textCursor();
 	QTextCharFormat fmt = TC.charFormat();
 	QFont font = fmt.font();
-
 	
 	QTextList* list = TC.currentList();
-	/*if (list) {
-		switch (list->format().style()) {
-		case QTextListFormat::ListDisc:
-			this->comboStyle->setCurrentIndex(1);
-			break;
-		case QTextListFormat::ListCircle:
-			this->comboStyle->setCurrentIndex(2);
-			break;
-		case QTextListFormat::ListSquare:
-			this->comboStyle->setCurrentIndex(3);
-			break;
-		case QTextListFormat::ListDecimal:
-			this->comboStyle->setCurrentIndex(4);
-			break;
-		case QTextListFormat::ListLowerAlpha:
-			this->comboStyle->setCurrentIndex(5);
-			break;
-		case QTextListFormat::ListUpperAlpha:
-			this->comboStyle->setCurrentIndex(6);
-			break;
-		case QTextListFormat::ListLowerRoman:
-			this->comboStyle->setCurrentIndex(7);
-			break;
-		case QTextListFormat::ListUpperRoman:
-			this->comboStyle->setCurrentIndex(8);
-			break;
-		default:
-			this->comboStyle->setCurrentIndex(-1);
-			break;
-		}
-	}
-	else {
-		int headingLevel = this->m_textEdit->textCursor().blockFormat().headingLevel();
-		this->comboStyle->setCurrentIndex(headingLevel ? headingLevel + 8 : 0);
-	}*/
 
 	this->comboFont->setCurrentFont(m_textEdit->currentFont());
 	QPixmap pix(16, 16);
 	pix.fill(m_textEdit->textColor());
-	//this->actionTextColor->setIcon(QIcon("./Icons/040-paint bucket.png"));
 	this->actionTextColor->setIcon(pix);
 	const QList<int> standardSizes = QFontDatabase::standardSizes();
 	int size = m_textEdit->font().pointSize();
-	//QString t = TC.selectedText();
-	//this->textSize(t);
-	//this->comboSize->setCurrentIndex(standardSizes.indexOf(size));
 	this->styleChanged(font);
 	size = font.pointSize();
 	this->comboSize->setCurrentIndex(standardSizes.indexOf(size));
@@ -1361,7 +1158,6 @@ void Editor::colorChanged(const QColor& c) {
 	QPixmap pix(16, 16);
 	pix.fill(c);
 	this->actionTextColor->setIcon(pix);
-
 }
 
 void Editor::textColor()
@@ -1439,9 +1235,9 @@ void Editor::mousePressEvent(QMouseEvent* event) {
 
 void Editor::updateCursorPosition(bool isSelection) {
 	QTextCursor TC = m_textEdit->textCursor();
-	Message m(this->_CRDT->getSymbol(TC.position()).getPos(), CURSOR_S, _CRDT->getId(), isSelection);
-	//m_socketHandler->writeData(Serialize::fromObjectToArray(Serialize::messageSerialize(m, m_fileId, MESSAGE)));
-	emit dataToSend(Serialize::fromObjectToArray(Serialize::messageSerialize(m, m_fileId, MESSAGE)));
+	Cursor c = m_CRDT->getCursorPosition(TC.position());
+	//m_socketHandler->writeData(m_SerializeInstance->fromObjectToArray(m_SerializeInstance->messageSerialize(m, m_fileId, MESSAGE)));
+	emit dataToSend(m_SerializeInstance->fromObjectToArray(m_SerializeInstance->messageSerialize(c, m_fileId, MESSAGE)));
 }
 
 void Editor::showHideUsersIntervals() {
@@ -1454,7 +1250,7 @@ void Editor::paste()
 	int end, start;
 	start = end = 0;
 
-	if (this->lastStart != this->lastEnd && !this->_CRDT->isEmpty()) {
+	if (this->lastStart != this->lastEnd && !m_CRDT->isEmpty()) {
 		//
 
 		start = this->lastStart;
@@ -1488,7 +1284,7 @@ void Editor::paste()
 	this->m_textEdit->paste();
 
 
-	if (start != end && !this->_CRDT->isEmpty()) {
+	if (start != end && !m_CRDT->isEmpty()) {
 		this->lastStart = start;
 		this->lastEnd = end;
 
@@ -1503,7 +1299,7 @@ void Editor::paste()
 	m_textEdit->setTextCursor(TC);
 	this->lastText = m_textEdit->toPlainText();
 	this->lastCursor = this->m_textEdit->textCursor().position();
-	this->_CRDT->printPositions();
+	m_CRDT->printPositions();
 }
 
 void Editor::copy()
@@ -1512,7 +1308,7 @@ void Editor::copy()
 }
 
 void Editor::setSiteCounter(int siteCounter) {
-	this->_CRDT->setSiteCounter(siteCounter);
+	m_CRDT->setSiteCounter(siteCounter);
 }
 
 int Editor::getCursorPosition() {

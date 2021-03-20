@@ -7,17 +7,19 @@ Login::Login(QWidget* parent)
 {
 	ui.setupUi(this);
 	m_socketHandler->moveToThread(m_thread);
+	m_thread->start();
+	m_fileBrowserWindow = Q_NULLPTR;
+	m_newAccountWindow = Q_NULLPTR;
+	m_serializeInstance = Serialize::getInstance();
+	ui.loginButton->setEnabled(false);
+
 	connect(m_thread, &QThread::started, m_socketHandler.get(), &SocketHandler::run);
 	connect(m_socketHandler.get(), &SocketHandler::dataReceived, this, &Login::loginResult);
 	connect(this, &Login::dataToSend, m_socketHandler.get(), &SocketHandler::writeData, Qt::QueuedConnection);
 	connect(m_timer.get(), SIGNAL(timeout()), this, SLOT(showErrorMessage()));
-	m_thread->start();
-	m_fileBrowserWindow = Q_NULLPTR;
-	m_newAccountWindow = Q_NULLPTR;
-	//ilio
-	ui.loginButton->setEnabled(false);
 	connect(ui.usernameTextLine, &QLineEdit::textChanged, this, &Login::on_textChanged);
 	connect(ui.passwordTextLine, &QLineEdit::textChanged, this, &Login::on_textChanged);
+
 }
 
 Login::~Login()
@@ -52,9 +54,9 @@ void Login::on_loginButton_clicked()
 		//QString loginInfo = "";
 		//loginInfo.append(username).append(",").append(password);
 		//SocketMessage m(MessageTypes::LoginMessage, loginInfo.toUtf8());
-		QJsonObject message = Serialize::userSerialize(m_username, password, m_username, LOGIN);
-		//bool result = m_socketHandler->writeData(Serialize::fromObjectToArray(message));
-		//emit dataToSend(Serialize::fromObjectToArray(message));
+		QJsonObject message = m_serializeInstance->userSerialize(m_username, password, m_username, LOGIN);
+		//bool result = m_socketHandler->writeData(m_serializeInstance->fromObjectToArray(message));
+		//emit dataToSend(m_serializeInstance->fromObjectToArray(message));
 		loginResult(message);
 		//if (result) {
 		//	m_timer->setSingleShot(true);
@@ -83,7 +85,7 @@ void Login::showErrorMessage() {
 
 void Login::loginResult(QJsonObject response) {
 	//m_timer->stop();
-	QStringList serverMessage = Serialize::responseUnserialize(response);
+	QStringList serverMessage = m_serializeInstance->responseUnserialize(response);
 	bool result = serverMessage[0] == "true" ? true : false;
 
 	if (true) {

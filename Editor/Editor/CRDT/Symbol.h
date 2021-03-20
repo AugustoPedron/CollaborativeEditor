@@ -1,10 +1,10 @@
 #pragma once
-#include<iostream>
-#include<vector>
-#include<array>
-#include<QFont>
-#include<QColor>
-#include "../Structures/FormatStructure.h"//??
+#include <iostream>
+#include <vector>
+#include <array>
+#include <QFont>
+#include <QColor>
+#include "../Structures/FormatStructure.h"
 
 class Symbol
 {
@@ -16,11 +16,9 @@ private:
 	QFont font;
 	QColor color;
 	Qt::AlignmentFlag alignment;
-	//FormatStructure FS;
 
 public:
     Symbol(char character, std::array<int, 2> id, std::vector<int> vett, QFont font, QColor color, Qt::AlignmentFlag alignment);
-	Symbol(std::vector<int> vett);
 	Symbol();
 	~Symbol();
 	char getChar();

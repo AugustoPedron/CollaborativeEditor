@@ -13,9 +13,9 @@ il crdt dovrebbe girare anche sul server --> server ha id == 0 e non crea mai ca
 
 */
 
-CRDT::CRDT(int id) :_siteId(id), _counter(0)
+CRDT::CRDT(int id) :m_senderId(id), m_counter(0)
 {
-	this->_symbols.reserve(200000);
+	m_symbols.reserve(200000);
 }
 
 
@@ -28,16 +28,16 @@ __int64 CRDT::insert_symbol(Symbol symbol)
 	__int64 index = -1;
 
 
-	if (this->_symbols.empty() || symbol.getPos() > this->_symbols.back().getPos()) {
+	if (m_symbols.empty() || symbol.getPos() > m_symbols.back().getPos()) {
 		//inserisco in coda, lo faccio come prima operazione in modo da ottimizzare l'inserimento
 		//quando carico dal server
-		_symbols.push_back(symbol);
-		index = _symbols.size() - 1;
+		m_symbols.push_back(symbol);
+		index = m_symbols.size() - 1;
 	}
 	else {
 
 		//trovo l'iteratore che punta alla posizione in cui inserire basandomi sulle pos frazionarie
-		auto it = std::find_if(this->_symbols.begin(), this->_symbols.end(), [symbol](Symbol s) {
+		auto it = std::find_if(m_symbols.begin(), m_symbols.end(), [symbol](Symbol s) {
 
 			if (s.getPos() > symbol.getPos())
 				return true;
@@ -52,23 +52,23 @@ __int64 CRDT::insert_symbol(Symbol symbol)
 			return false;
 			});
 
-		if (it != _symbols.end()) {
+		if (it != m_symbols.end()) {
 
-			if (it == _symbols.begin()) {
+			if (it == m_symbols.begin()) {
 				index = 0;
 			}
 			else {
 
-				index = std::distance(_symbols.begin(), it);//mi dice la posizione del carattere nel crdt ossia dove sono in relazione 
+				index = std::distance(m_symbols.begin(), it);//mi dice la posizione del carattere nel crdt ossia dove sono in relazione 
 			   //all'inizio della Qstring che rappresenta il testo qui al contarario di prima ritorno solo se ho trovato 
 			   //altrimenti non devo fare nulla-->segnalato da -1 che è gestito nel process
 			}
-			_symbols.insert(it, symbol);
+			m_symbols.insert(it, symbol);
 
 		}
 	}
 
-	if ((unsigned)index < _symbols.size())
+	if ((unsigned)index < m_symbols.size())
 		return index;
 	else
 		return (index - 1);//non so se va messo o basta ritornare sempre index fare prove 
@@ -78,24 +78,24 @@ __int64 CRDT::delete_symbol(Symbol symbol)
 {
 	__int64 index;
 
-	auto it = std::find_if(this->_symbols.begin(), this->_symbols.end(),
+	auto it = std::find_if(m_symbols.begin(), m_symbols.end(),
 		[symbol](Symbol s) {return ((symbol.getId() == s.getId())); });
 
-	if (it != _symbols.end()) {
+	if (it != m_symbols.end()) {
 
 
-		if (it == _symbols.begin()) {
+		if (it == m_symbols.begin()) {
 			index = 0;
 		}
 		else {
 
-			index = std::distance(_symbols.begin(), it);//mi dice la posizione del carattere nel crdt ossia dove sono in relazione 
+			index = std::distance(m_symbols.begin(), it);//mi dice la posizione del carattere nel crdt ossia dove sono in relazione 
 		   //all'inizio della Qstring che rappresenta il testo qui al contarario di prima ritorno solo se ho trovato 
 		   //altrimenti non devo fare nulla-->segnalato da -1 che è gestito nel process
 		}
 
 		//vuol dire che l'ho trovato
-		_symbols.erase(it);
+		m_symbols.erase(it);
 
 		return index;
 	}
@@ -105,17 +105,17 @@ __int64 CRDT::delete_symbol(Symbol symbol)
 __int64 CRDT::change_symbol(Symbol symbol) {
 	__int64 index;
 
-	auto it = std::find_if(this->_symbols.begin(), this->_symbols.end(),
+	auto it = std::find_if(m_symbols.begin(), m_symbols.end(),
 		[symbol](Symbol s) {return ((s.getPos() == symbol.getPos()) && (symbol.getId() == s.getId())); });
 
 
-	if (it != _symbols.end()) {
+	if (it != m_symbols.end()) {
 		//vuol dire che l'ho trovato
 		(it)->setFont(symbol.getFont());
 		(it)->setColor(symbol.getColor());
 		(it)->setAlignment(symbol.getAlignment());
 
-		index = std::distance(_symbols.begin(), it);
+		index = std::distance(m_symbols.begin(), it);
 
 
 		return index;
@@ -161,35 +161,35 @@ Message CRDT::localInsert(int index, char value, QFont font, QColor color, Qt::A
 	std::array<int, 2> a;
 	std::vector<int> pos;
 	//se è vuoto ha pos 0
-	if (_symbols.empty()) {
+	if (m_symbols.empty()) {
 		pos.push_back(0);
-		Symbol s(value, a = { this->_siteId,_counter++ }, pos, font, color, alignment);
-		_symbols.push_back(s);
+		Symbol s(value, a = { m_senderId,m_counter++ }, pos, font, color, alignment);
+		m_symbols.push_back(s);
 
 		//mando il messaggio
-		Message m(s, INSERT, this->_siteId);
+		Message m(s, INSERT, m_senderId);
 		return m;
 	}
 	//caso particolare se inserisco in zero
 	if (index == 0) {
-		int tmp = _symbols.at(index).getPos()[0];
+		int tmp = m_symbols.at(index).getPos()[0];
 		pos.push_back(tmp - 1);
 
 
-		Symbol s(value, a = { this->_siteId,_counter++ }, pos, font, color, alignment);
-		_symbols.insert(_symbols.begin() + index, s);
+		Symbol s(value, a = { m_senderId,m_counter++ }, pos, font, color, alignment);
+		m_symbols.insert(m_symbols.begin() + index, s);
 
 		//mando il messaggio
-		Message m(s, INSERT, this->_siteId);
+		Message m(s, INSERT, m_senderId);
 
 		return m;
 
 	}
 
-	if ((unsigned)index < _symbols.size()) {
+	if ((unsigned)index < m_symbols.size()) {
 		//devo trovare l'indice frazionario 
-		std::vector<int> previous = _symbols.at(index - 1).getPos();
-		std::vector<int> curr = _symbols.at(index).getPos();
+		std::vector<int> previous = m_symbols.at(index - 1).getPos();
+		std::vector<int> curr = m_symbols.at(index).getPos();
 
 		if ((curr.size() <= previous.size()) /*1st version||( (previous.at(0) < 0))&&(curr.size() <= previous.size())*/) {
 			//metto 5 in fondo
@@ -214,26 +214,26 @@ Message CRDT::localInsert(int index, char value, QFont font, QColor color, Qt::A
 			//pos.push_back(1);//O(1)
 		}
 
-		Symbol s(value, a = { this->_siteId,_counter++ }, pos, font, color, alignment);
-		_symbols.insert(_symbols.begin() + index, s);
+		Symbol s(value, a = { m_senderId,m_counter++ }, pos, font, color, alignment);
+		m_symbols.insert(m_symbols.begin() + index, s);
 
 
 		//mando il messaggio
-		Message m(s, INSERT, this->_siteId);
+		Message m(s, INSERT, m_senderId);
 
 
 		return m;
 
 	}
 	else {
-		if ((unsigned)index == _symbols.size()) {
+		if ((unsigned)index == m_symbols.size()) {
 			//inserisco in coda
-			int new_index = _symbols.back().getPos().at(0) + 1;
+			int new_index = m_symbols.back().getPos().at(0) + 1;
 			pos.push_back(new_index);
-			Symbol s(value, a = { this->_siteId,_counter++ }, pos, font, color, alignment);
-			_symbols.push_back(s);
+			Symbol s(value, a = { m_senderId,m_counter++ }, pos, font, color, alignment);
+			m_symbols.push_back(s);
 			//mando il messaggio
-			Message m(s, INSERT, this->_siteId);
+			Message m(s, INSERT, m_senderId);
 
 			//QTextStream(stdout) << font.toString() << endl;
 
@@ -249,30 +249,30 @@ Message CRDT::localInsert(int index, char value, QFont font, QColor color, Qt::A
 
 Message CRDT::localErase(int index)
 {
-	if ((unsigned)index > _symbols.size()) {
+	if ((unsigned)index > m_symbols.size()) {
 		throw std::length_error("Indice errato\n");
 	}
 	//trovo il simbolo
-	Symbol s = _symbols.at(index);
+	Symbol s = m_symbols.at(index);
 	//quello che elimino è per me un nuovo carattere
 
 
 	//mando il messaggio
-	Message m(s, DELETE_S, this->_siteId);
+	Message m(s, DELETE_S, m_senderId);
 
 	//elimino il simbolo dal vettore locale
-	_symbols.erase(_symbols.begin() + index);
+	m_symbols.erase(m_symbols.begin() + index);
 
 	return m;
 }
 
 Message CRDT::localChange(int index, char value, QFont font, QColor color, Qt::AlignmentFlag alignment)
 {
-	_symbols.at(index).setColor(color);
-	_symbols.at(index).setFont(font);
-	_symbols.at(index).setAlignment(alignment);
-	Symbol s = _symbols.at(index);
-	Message m(s, CHANGE, this->_siteId);
+	m_symbols.at(index).setColor(color);
+	m_symbols.at(index).setFont(font);
+	m_symbols.at(index).setAlignment(alignment);
+	Symbol s = m_symbols.at(index);
+	Message m(s, CHANGE, m_senderId);
 	return m;
 }
 
@@ -280,7 +280,7 @@ Message CRDT::localChange(int index, char value, QFont font, QColor color, Qt::A
 std::string CRDT::to_string()
 {
 	std::string str;
-	for (Symbol s : _symbols)
+	for (Symbol s : m_symbols)
 		str.push_back(s.getChar());
 
 	return str;
@@ -288,20 +288,20 @@ std::string CRDT::to_string()
 
 int CRDT::getId()
 {
-	return this->_siteId;
+	return m_senderId;
 }
 
 Symbol CRDT::getSymbol(int index)
 {
-	if (index < this->_symbols.size())
-		return this->_symbols.at(index);
+	if (index < m_symbols.size())
+		return m_symbols.at(index);
 	//caso in cui viene mandata la posizione del cursore agli altri client senza alcun carattere inserito,
 	//oppure viene mandata agli altri client la posizione del cursore quando si trova dopo l'ultimo carattere inserito
-	else {
-		std::vector<int> pos;
-		pos.push_back(INT_MAX);
-		return Symbol(pos);
-	}
+	//else {
+	//	std::vector<int> pos;
+	//	pos.push_back(INT_MAX);
+	//	return Symbol(pos);
+	//}
 }
 
 
@@ -309,7 +309,7 @@ Symbol CRDT::getSymbol(int index)
 std::vector<Message> CRDT::getMessageArray()
 {
 	std::vector<Message> msgs;
-	for (Symbol s : this->_symbols) {
+	for (Symbol s : m_symbols) {
 
 		Message m(s, INSERT, -1);//il server ha id -1
 		msgs.push_back(m);
@@ -350,7 +350,7 @@ QJsonObject ObjectFromString(const QString& in)
 std::vector<Message> CRDT::readFromFile(std::string fileName)//NON USARE ANCORA MODIFICHE DA FARE-->MATTIA--> TOGLIERE LA LISTA DI MESSAGGI USATA PER TESTARE IL CLIENT
 {
 	std::ifstream iFile(fileName);
-	std::vector<Symbol> local_symbols;
+	std::vector<Symbol> localm_symbols;
 	if (iFile.is_open())
 	{
 		std::string line;
@@ -393,17 +393,17 @@ std::vector<Message> CRDT::readFromFile(std::string fileName)//NON USARE ANCORA 
 			Symbol s(c, a, pos, font, color, alignFlag);
 
 
-			this->_symbols.push_back(s);
+			m_symbols.push_back(s);
 
 			//per fare prove
-			//local_symbols.push_back(s);
+			//localm_symbols.push_back(s);
 		}
 
 
 		iFile.close();
 		std::vector<Message> local_m;
 		//prima carico tutto e poi inizio a mandare i messaggi
-		for (auto symb : this->_symbols) {
+		for (auto symb : m_symbols) {
 
 			Message m(symb, CHANGE, 0);//L'ID del server è 0 sempre
 			local_m.push_back(m);
@@ -421,7 +421,7 @@ QString CRDT::crdt_serialize()
 {
 	QString text = "";
 
-	for (auto s : this->_symbols) {
+	for (auto s : m_symbols) {
 
 		QJsonObject obj;
 
@@ -478,13 +478,13 @@ QString CRDT::crdt_serialize()
 void CRDT::saveOnFile(std::string filename)
 {
 
-	QString serialized_text = this->crdt_serialize();
+	QString serialized_text = crdt_serialize();
 
 	std::ofstream oFile(filename, std::ios_base::out | std::ios_base::trunc);
 	if (oFile.is_open())
 	{
 
-		//std::string text = this->to_string();
+		//std::string text = to_string();
 		{
 			//oFile << text;
 			oFile << serialized_text.toStdString();
@@ -499,25 +499,30 @@ void CRDT::saveOnFile(std::string filename)
 
 bool CRDT::isEmpty()
 {
-	return this->_symbols.size() == 0;
+	return m_symbols.size() == 0;
+}
+
+Cursor CRDT::getCursorPosition(int index) {
+	if (index < m_symbols.size())
+		return Cursor(m_senderId, m_symbols.at(index).getPos());
 }
 
 __int64 CRDT::getCursorPosition(std::vector<int> crdtPos) {
 	__int64 index = -1;
 
 
-	if (this->_symbols.empty()) {
+	if (m_symbols.empty()) {
 		//inserisco in coda, lo faccio come prima operazione in modo da ottimizzare l'inserimento
 		//quando carico dal server
 		index = 0;
 	}
-	else if (crdtPos > this->_symbols.back().getPos()) {
-		index = this->_symbols.size();
+	else if (crdtPos > m_symbols.back().getPos()) {
+		index = m_symbols.size();
 	}
 	else {
 
 		//trovo l'iteratore che punta alla posizione in cui inserire basandomi sulle pos frazionarie
-		auto it = std::find_if(this->_symbols.begin(), this->_symbols.end(), [crdtPos](Symbol s) {
+		auto it = std::find_if(m_symbols.begin(), m_symbols.end(), [crdtPos](Symbol s) {
 
 			if (s.getPos() >= crdtPos)
 				return true;
@@ -532,9 +537,9 @@ __int64 CRDT::getCursorPosition(std::vector<int> crdtPos) {
 			return false;
 			});
 
-		if (it != _symbols.end()) {
+		if (it != m_symbols.end()) {
 
-			index = std::distance(_symbols.begin(), it);//mi dice la posizione del carattere nel crdt ossia dove sono in relazione 
+			index = std::distance(m_symbols.begin(), it);//mi dice la posizione del carattere nel crdt ossia dove sono in relazione 
 		   //all'inizio della Qstring che rappresenta il testo qui al contarario di prima ritorno solo se ho trovato 
 		   //altrimenti non devo fare nulla-->segnalato da -1 che è gestito nel process
 
@@ -542,7 +547,7 @@ __int64 CRDT::getCursorPosition(std::vector<int> crdtPos) {
 		}
 	}
 
-	if ((unsigned)index <= _symbols.size())
+	if ((unsigned)index <= m_symbols.size())
 		return index;
 	else
 		return (index - 1);//non so se va messo o basta ritornare sempre index fare prove 
@@ -553,11 +558,11 @@ void CRDT::updateUserInterval() {
 	int start = 0;
 	int end = 0;
 	int userId = -1;
-	for (auto it = _symbols.begin(); it != _symbols.end(); it++) {
-		if (it->getId()[0] != this->_siteId) {
+	for (auto it = m_symbols.begin(); it != m_symbols.end(); it++) {
+		if (it->getId()[0] != m_senderId) {
 			userId = it->getId()[0];
 			end++;
-			if ((it + 1) != _symbols.end() && userId != (it + 1)->getId()[0]) {
+			if ((it + 1) != m_symbols.end() && userId != (it + 1)->getId()[0]) {
 				m_usersInterval.emplace_back(userId, start, end);
 				start = end;
 			}
@@ -572,7 +577,7 @@ void CRDT::updateUserInterval() {
 		//	userId = it->getId()[0];
 		//	end++;
 		//	it++;
-		//	if (it == _symbols.end()) break;
+		//	if (it == m_symbols.end()) break;
 		//} while (it->getId()[0] == userId);
 		//m_usersInterval.emplace_back(userId, start, end);
 	}
@@ -580,5 +585,5 @@ void CRDT::updateUserInterval() {
 }
 
 void CRDT::setSiteCounter(int siteCounter) {
-	this->_counter = siteCounter;
+	m_counter = siteCounter;
 }

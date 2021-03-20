@@ -12,6 +12,7 @@ ModifyPassword::ModifyPassword(QSharedPointer<SocketHandler> socketHandler, QWid
 	ui.setupUi(this);
 	this->move_rubberband = false;
 	m_selectionArea = Q_NULLPTR;
+	m_serializeInstance = Serialize::getInstance();
 	connect(m_socketHandler.get(), &SocketHandler::dataReceived, this, &ModifyPassword::changeResult);
 	connect(this, &ModifyPassword::dataToSend, m_socketHandler.get(), &SocketHandler::writeData, Qt::QueuedConnection);
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(showErrorMessage()));
@@ -43,8 +44,8 @@ void ModifyPassword::on_okButton_clicked() {
 
 	if (oldPassword != "" && newPassword != "" && confirmPassword != "") {
 		if (newPassword.compare(confirmPassword) == 0) {
-			QJsonObject passwordSerialize = Serialize::changePasswordSerialize(oldPassword, newPassword, CHANGE_PASSWORD); 
-			//bool result = m_socketHandler->writeData(Serialize::fromObjectToArray(passwordSerialize)); //da risultato falso questo perchè?
+			QJsonObject passwordSerialize = m_serializeInstance->changePasswordSerialize(oldPassword, newPassword, CHANGE_PASSWORD); 
+			//bool result = m_socketHandler->writeData(m_serializeInstance->fromObjectToArray(passwordSerialize)); //da risultato falso questo perchè?
 
 			/*if (result) {
 				m_timer->setSingleShot(true);
@@ -57,7 +58,7 @@ void ModifyPassword::on_okButton_clicked() {
 				resultDialog.setInformativeText("Errore di connessione");
 				resultDialog.exec();
 			}*/
-			emit dataToSend(Serialize::fromObjectToArray(passwordSerialize));
+			emit dataToSend(m_serializeInstance->fromObjectToArray(passwordSerialize));
 		}
 		else {
 			QMessageBox::warning(this, "ModifyPassword", "Password non coincidenti!");
@@ -82,7 +83,7 @@ void ModifyPassword::changeResult(QJsonObject response)
 {
 	m_timer->stop();
 	disconnect(m_socketHandler.get(), &SocketHandler::dataReceived, this, &ModifyPassword::changeResult);
-	QStringList serverMessage = Serialize::responseUnserialize(response);
+	QStringList serverMessage = m_serializeInstance->responseUnserialize(response);
 	bool result = serverMessage[0] == "true" ? true : false;
 
 	if (!result) {

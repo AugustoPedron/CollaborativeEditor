@@ -14,6 +14,7 @@ NewAccount::NewAccount(QSharedPointer<SocketHandler> socketHandler, QWidget* par
 	m_selectionArea = Q_NULLPTR;
 	m_croppedImage = Q_NULLPTR;
 	m_originalSize = ui.imageLabel->size();
+	m_serializeInstance = Serialize::getInstance();
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	connect(m_socketHandler.get(), &SocketHandler::dataReceived, this, &NewAccount::registrationResult);
 	connect(this, &NewAccount::dataToSend, m_socketHandler.get(), &SocketHandler::writeData, Qt::QueuedConnection);
@@ -90,8 +91,8 @@ void NewAccount::on_submit_clicked() {
 	QString email = ui.emailLine->text();
 	if (username != "" && email != "") {
 		if (password.compare(password_re) == 0) {
-			QJsonObject userInfoSerialized = Serialize::userSerialize(username, password, email, REGISTER, m_croppedImage); //ilio
-			//bool result = m_socketHandler->writeData(Serialize::fromObjectToArray(userInfoSerialized));
+			QJsonObject userInfoSerialized = m_serializeInstance->userSerialize(username, password, email, REGISTER, m_croppedImage); //ilio
+			//bool result = m_socketHandler->writeData(m_serializeInstance->fromObjectToArray(userInfoSerialized));
 			//if (result) {
 			//	m_timer->setSingleShot(true);
 			//	m_timer->setInterval(4000);
@@ -103,7 +104,7 @@ void NewAccount::on_submit_clicked() {
 			//	resultDialog.setInformativeText("Errore di connessione");
 			//	resultDialog.exec();
 			//}
-			emit dataToSend(Serialize::fromObjectToArray(userInfoSerialized));
+			emit dataToSend(m_serializeInstance->fromObjectToArray(userInfoSerialized));
 			//if (m_croppedImage != Q_NULLPTR) {
 			//	QPoint areaPos = m_selectionArea->geometry().topLeft();
 			//	areaPos.setX(areaPos.x() - ui.imageLabel->pos().x());
@@ -224,7 +225,7 @@ void NewAccount::on_cancel_clicked() {
 
 void NewAccount::registrationResult(QJsonObject response) {
 	m_timer->stop();
-	QStringList serverMessage = Serialize::responseUnserialize(response);
+	QStringList serverMessage = m_serializeInstance->responseUnserialize(response);
 	bool result = serverMessage[0] == "true" ? true : false;
 	if (result) {
 		QMessageBox resultDialog(this);

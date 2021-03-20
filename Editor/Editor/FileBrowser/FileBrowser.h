@@ -44,6 +44,7 @@ private:
 	QColor m_userColor;
 	QTimer* m_timer;
 	bool m_openAfterUri;
+	Serialize* m_serializeInstance;
 
 	void closeEvent(QCloseEvent* event);
 	void removeBlank();

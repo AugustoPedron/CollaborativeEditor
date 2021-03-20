@@ -77,7 +77,7 @@ private:
 	QColor m_userColor;
 
 	//MATTIA---------------------------------------------------------------------------------
-	CRDT* _CRDT;
+	CRDT* m_CRDT;
 
 	int ID;//è quello dato dal server--> da dare al crdt come id per crere i caratteri univoci
 
@@ -101,6 +101,7 @@ private:
 	QTimer* insert_timer;
 	//FINE-------------------------------------------------------------------------------------------------------
 
+	Serialize* m_SerializeInstance;
 
 	void closeEvent(QCloseEvent* event);
 	void createActions();

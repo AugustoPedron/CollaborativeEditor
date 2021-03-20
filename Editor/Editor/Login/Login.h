@@ -16,9 +16,11 @@ class Login : public QMainWindow
 
 public:
 	Login(QWidget* parent = Q_NULLPTR);
+	Login(QWidget* parent);
 	~Login();
 
 private:
+	Serialize* m_serializeInstance;
 	bool newWindow = false;
 	int clientID;
 	QThread* m_thread;
