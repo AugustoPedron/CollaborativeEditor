@@ -11,7 +11,7 @@
 #include <vector>
 #include <QByteArray>
 
-#include "define.h"
+#include "MessageTypes.h"
 #include "../CRDT/CRDT.h"
 
 class Serialize : public QObject

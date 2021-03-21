@@ -19,7 +19,7 @@
     <ClInclude Include="Editor\UserInterval.h">
       <Filter>Editor</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization\define.h">
+    <ClInclude Include="Serialization\MessageTypes.h">
       <Filter>Serialization</Filter>
     </ClInclude>
     <ClInclude Include="CRDT\Cursor.h">

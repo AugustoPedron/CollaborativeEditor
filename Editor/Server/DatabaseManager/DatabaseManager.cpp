@@ -117,7 +117,7 @@ void DatabaseManager::sendError(ClientManager* client) {
     QByteArray response;
 
     message = "SERVER ERROR";
-    response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, SERVER_ANSWER));
+    response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, MessageTypes::ServerAnswer));
     client->writeData(response);
     //   sendMessage(socket, response);
     return;
@@ -128,7 +128,7 @@ void DatabaseManager::sendSuccess(ClientManager* client) {
     QByteArray response;
 
     message = "OK";
-    response = Serialize::fromObjectToArray(Serialize::responseSerialize(true, message, SERVER_ANSWER));
+    response = Serialize::fromObjectToArray(Serialize::responseSerialize(true, message, MessageTypes::ServerAnswer));
     client->writeData(response);
     //sendMessage(socket, response);
     return;
@@ -252,7 +252,7 @@ bool DatabaseManager::checkPassword(QString password, ClientManager* client) {
                 else {
                     qDebug() << "Password not valid!!\n";
                     message = "WRONG USERNAME OR PASSWORD";
-                    response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, SERVER_ANSWER));
+                    response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, MessageTypes::ServerAnswer));
                     client->writeData(response);
                     // sendMessage(socket, response);
                     instance->db.close();
@@ -293,7 +293,7 @@ void DatabaseManager::registration(QString username, QString email, QString pass
     /*CONTROLLO VALIDIT‡ ED UNICIT‡ DELLA EMAIL */
     if (!is_email_valid(email)) {
         message = "Email format is incorrect or the email used is not unique.";
-        response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, SERVER_ANSWER));
+        response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, MessageTypes::ServerAnswer));
         incomingClient->writeData(response);
         return;
 
@@ -303,7 +303,7 @@ void DatabaseManager::registration(QString username, QString email, QString pass
     if (!instance->is_username_unique(username)) {
         qDebug("username already exists\n");
         message = "Username already exist";
-        response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, SERVER_ANSWER));
+        response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, MessageTypes::ServerAnswer));
         incomingClient->writeData(response);
         return;
     }
@@ -351,7 +351,7 @@ void DatabaseManager::registration(QString username, QString email, QString pass
         else {
             qDebug("image not saved!!\n");
             message = "image not saved!\n";
-            response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, SERVER_ANSWER));
+            response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, MessageTypes::ServerAnswer));
             incomingClient->writeData(response);
             instance->db.close();
             return;
@@ -436,7 +436,7 @@ void DatabaseManager::login(QString username, QString password, ClientManager* i
                     else {
                         qDebug("image not available!!\n");
                         message = "image not available!\n";
-                        response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, SERVER_ANSWER));
+                        response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, MessageTypes::ServerAnswer));
                         incomingClient->writeData(response);
                         instance->db.close();
                         return;
@@ -447,7 +447,7 @@ void DatabaseManager::login(QString username, QString password, ClientManager* i
                     incomingClient->setColor(userColor);
                     instance->activeusers.push_back(incomingClient);
                     // instance->users.insert(username, new ClientManager(userid,socket));
-                    response = Serialize::fromObjectToArray(Serialize::responseSerialize(true, profileImage, SERVER_ANSWER, username, email, userid, userColor)); // ho dovuto modificare la funzione per includere anche l'username per poterla usare nel changeProfile. Per non cambiare tutto mando anche qui l'username anche se inutile
+                    response = Serialize::fromObjectToArray(Serialize::responseSerialize(true, profileImage, MessageTypes::ServerAnswer, username, email, userid, userColor)); // ho dovuto modificare la funzione per includere anche l'username per poterla usare nel changeProfile. Per non cambiare tutto mando anche qui l'username anche se inutile
 
                     incomingClient->writeData(response);
                     instance->db.close();
@@ -462,7 +462,7 @@ void DatabaseManager::login(QString username, QString password, ClientManager* i
             else {
                 qDebug() << "Username not valid\n";
                 message = "WRONG USERNAME OR PASSWORD";
-                response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, SERVER_ANSWER));
+                response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, MessageTypes::ServerAnswer));
                 incomingClient->writeData(response);
                 instance->db.close();
                 return;
@@ -527,7 +527,7 @@ void DatabaseManager::createFile(QString filename, ClientManager* client) {
                 //l'utente non pu√≤ avere 2 file con lo stesso nome
                 qDebug() << "ERROR: THE FILE ALREADY EXISTS!\n";
                 message = "THE FILE ALREADY EXISTS";  // NON COMPARE IL MESSAGGIO !!!!!!!!!!!!!!
-                response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, SERVER_ANSWER));
+                response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, MessageTypes::ServerAnswer));
                 client->writeData(response);
                 instance->db.close();
                 return;
@@ -577,7 +577,7 @@ void DatabaseManager::createFile(QString filename, ClientManager* client) {
                             stream << text_path;
                             file.close();
                         }*/ 
-                        response = Serialize::fromObjectToArray(Serialize::newFileSerialize(filename, fileId, NEWFILE));
+                        response = Serialize::fromObjectToArray(Serialize::newFileSerialize(filename, fileId, MessageTypes::NewFile));
                         client->writeData(response);
                         qDebug() << "sono qui\n";
 
@@ -654,7 +654,7 @@ void DatabaseManager::sendFileList(ClientManager* client) {
             }
 
             if (atLeastOne) {
-                response = Serialize::fromObjectToArray(Serialize::FileListSerialize(fileList, SEND_FILES));
+                response = Serialize::fromObjectToArray(Serialize::FileListSerialize(fileList, MessageTypes::SendFiles));
                 client->writeData(response);
             }
             else {
@@ -695,7 +695,7 @@ void DatabaseManager::openFile(int fileId, ClientManager* client) {
         if (instance->files.value(fileId)->getUsers().contains(client)) {
             qDebug() << "file already opened!\n";
             message = "file already opened!";
-            response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, SERVER_ANSWER));
+            response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, MessageTypes::ServerAnswer));
             client->writeData(response);
             return;
         }
@@ -730,7 +730,7 @@ void DatabaseManager::openFile(int fileId, ClientManager* client) {
         f = instance->getFile(fileId);
         f->addUser(client);
         qDebug() << "ho inviato il file che era gia in RAM\n";
-        response = Serialize::fromObjectToArray(Serialize::siteCounterSerialize(fileId, siteCounter, SITECOUNTER));
+        response = Serialize::fromObjectToArray(Serialize::siteCounterSerialize(fileId, siteCounter, MessageTypes::SiteCounter));
         client->writeData(response);
 
         // sendSuccess(client);
@@ -754,7 +754,7 @@ void DatabaseManager::openFile(int fileId, ClientManager* client) {
                     instance->files.value(fileId)->addUser(client);
                     qDebug() << "user added!\n";
                     //sendSuccess(client);
-                    response = Serialize::fromObjectToArray(Serialize::siteCounterSerialize(fileId, siteCounter, SITECOUNTER));
+                    response = Serialize::fromObjectToArray(Serialize::siteCounterSerialize(fileId, siteCounter, MessageTypes::SiteCounter));
                     client->writeData(response);
                     instance->db.close();
 
@@ -763,7 +763,7 @@ void DatabaseManager::openFile(int fileId, ClientManager* client) {
                 else {
                     qDebug() << "this file does not exist!\n";
                     message = "this file does not exist!";
-                    response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, SERVER_ANSWER));
+                    response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, MessageTypes::ServerAnswer));
                     client->writeData(response);
                     instance->db.close();
                     return;
@@ -803,7 +803,7 @@ void DatabaseManager::closeFile(int fileId, int siteCounter, ClientManager* clie
     if (!instance->files.contains(fileId)) { // se il file non si trova nella mappa di file attivi in quel momento vuol dire che o nessuno lo sta utilizzando e quindi √® gi√  chiuso oppure che non esiste
         qDebug() << "this file does not exist or it is not opened!\n";
         message = "this file does not exist or it is not opened!";
-        response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, SERVER_ANSWER));
+        response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, MessageTypes::ServerAnswer));
         client->writeData(response);
         return;
     }
@@ -858,7 +858,7 @@ void DatabaseManager::closeFile(int fileId, int siteCounter, ClientManager* clie
                 oldName = instance->changeFileName(oldPath, newName, fileId, client);
 
                 if (oldName != nullptr) {
-                    response = Serialize::fromObjectToArray(Serialize::renameFileSerialize(oldName, newName, RENAME));
+                    response = Serialize::fromObjectToArray(Serialize::renameFileSerialize(oldName, newName, MessageTypes::Rename));
                     for (i = 0; i < instance->files.value(fileId)->getRUsers().size(); i++) {
                         f->getRUsers().at(i)->writeData(response);
                         //non rimuovo tutti questi client perche tanto tra poco f verr‡ eliminato 
@@ -1068,7 +1068,7 @@ void DatabaseManager::renameFile(int fileId, QString newName, ClientManager* cli
 
                                     user = instance->activeusers.at(i);
                                     oldName = instance->changeFileName(oldPath, newName, fileId, user);
-                                    response = Serialize::fromObjectToArray(Serialize::renameFileSerialize(oldName, newName, RENAME));
+                                    response = Serialize::fromObjectToArray(Serialize::renameFileSerialize(oldName, newName, MessageTypes::Rename));
                                     user->writeData(response);
 
                                 }
@@ -1122,7 +1122,7 @@ void DatabaseManager::getURIToShare(int fileid, ClientManager* client) {
     }
     if (instance->files.contains(fileid)) {
         URI = instance->files.value(fileid)->getPath();
-        response = Serialize::fromObjectToArray(Serialize::URISerialize(URI, SHARE));
+        response = Serialize::fromObjectToArray(Serialize::URISerialize(URI, MessageTypes::Share));
         client->writeData(response);
     }
     else {
@@ -1163,7 +1163,7 @@ void DatabaseManager::SharedFileAcquisition(QString URI, ClientManager* client) 
             else {
                 qDebug() << "this file does not exist!\n";
                 message = "this file does not exist!";
-                response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, SERVER_ANSWER));
+                response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, MessageTypes::ServerAnswer));
                 client->writeData(response);
                 instance->db.close();
                 return;
@@ -1184,7 +1184,7 @@ void DatabaseManager::SharedFileAcquisition(QString URI, ClientManager* client) 
                 //sendSuccess(client);
                 QMap<int, QString> id_file;
                 id_file.insert(fileId, filename);
-                QByteArray message = Serialize::fromObjectToArray(Serialize::FileListSerialize(id_file, SEND_FILES));
+                QByteArray message = Serialize::fromObjectToArray(Serialize::FileListSerialize(id_file, MessageTypes::SendFiles));
                 client->writeData(message);
                 instance->db.close();
                 //√® meglio aspettare una richiesta specifica dal client per aprire il file perch√® se il client fosse lento si perderebbe i messaggi
@@ -1298,7 +1298,7 @@ void DatabaseManager::changeEmail(QString newEmail, ClientManager* client) {
     if (!is_email_valid(newEmail)) {
         qDebug() << "not a valid email!\n";
         message = "EMAIL IS NOT VALID!";
-        response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, SERVER_ANSWER));
+        response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, MessageTypes::ServerAnswer));
         client->writeData(response);
         return;
     }
@@ -1357,7 +1357,7 @@ void DatabaseManager::changeProfilePic(QString profileImage, ClientManager* clie
     else {
         qDebug("image not saved!!\n");
         message = "image not saved!\n";
-        response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, SERVER_ANSWER));
+        response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, MessageTypes::ServerAnswer));
         client->writeData(response);
         instance->db.close();
         return;
@@ -1433,7 +1433,7 @@ void DatabaseManager::changeProfile(QString oldUsername, QString newUsername, QS
         else {
             qDebug("image not saved!!\n");
             message = "image not saved!\n";
-            response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, SERVER_ANSWER));
+            response = Serialize::fromObjectToArray(Serialize::responseSerialize(false, message, MessageTypes::ServerAnswer));
             client->writeData(response);
             instance->db.close();
             return;
@@ -1457,7 +1457,7 @@ void DatabaseManager::changeProfile(QString oldUsername, QString newUsername, QS
                 client->setUsername(newUsername);
                 client->setEmail(newEmail);
                 QColor userColor = client->getColor();
-                response = Serialize::fromObjectToArray(Serialize::changeProfileResponseSerialize(true, newUsername, newEmail, newImage, "", SERVER_ANSWER));
+                response = Serialize::fromObjectToArray(Serialize::changeProfileResponseSerialize(true, newUsername, newEmail, newImage, "", MessageTypes::ServerAnswer));
 
                 client->writeData(response);
                 //sendSuccess(client);
@@ -1479,7 +1479,7 @@ void DatabaseManager::changeProfile(QString oldUsername, QString newUsername, QS
     }
     else {
         message = "username or email (or both) is/are not valid\n";
-        response = Serialize::fromObjectToArray(Serialize::changeProfileResponseSerialize(false, "", "", "", message, SERVER_ANSWER));
+        response = Serialize::fromObjectToArray(Serialize::changeProfileResponseSerialize(false, "", "", "", message, MessageTypes::ServerAnswer));
         client->writeData(response);
         return;
     }

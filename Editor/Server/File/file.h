@@ -6,12 +6,12 @@
 #include "../Serialize/Serialize.h"
 #include "../ClientManager/clientmanager.h"
 
-struct CursorPosition{
+struct CursorPos{
     std::vector<int> pos;
     bool afterInsert;
 
-    CursorPosition(){};
-    CursorPosition(std::vector<int> pos, bool afterInsert) : pos(pos), afterInsert(afterInsert){};
+    CursorPos(){};
+    CursorPos(std::vector<int> pos, bool afterInsert) : pos(pos), afterInsert(afterInsert){};
 };
 
 class File
@@ -48,6 +48,6 @@ private:
     //QVector<ClientManager*> users;
     QMap <int, ClientManager*> users;
     QList<ClientManager*> r_users; //lista di utenti che lavorano su un file che deve essere rinominato
-    QMap <ClientManager*, CursorPosition> m_usersCursorPosition;
+    QMap <ClientManager*, CursorPos> m_usersCursorPosition;
 
 };

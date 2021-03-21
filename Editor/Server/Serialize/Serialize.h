@@ -11,7 +11,7 @@
 #include <QByteArray>
 #include <QPixmap>
 
-#include "define.h"
+#include "MessageTypes.h"
 #include "../CRDT/CRDT.h"
 
 class Serialize

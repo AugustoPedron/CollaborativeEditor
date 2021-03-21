@@ -126,7 +126,7 @@ void MyServer::MessageHandler(ClientManager *client, QByteArray socketData){
 
 #define LOGIN 1
 #define LOGOUT 2
-#define REGISTER 3
+#define MessageTypes::Register 3
 #define FILENAME 4
 #define MESSAGE 5
 #define TEXT 6
@@ -160,7 +160,7 @@ void MyServer::MessageHandler(ClientManager *client, QByteArray socketData){
 
 
     switch (type) {
-    case (LOGIN):
+    case (MessageTypes::LoginRequest):
         qDebug("LOGIN request\n");
 
          list = Serialize::userUnserialize(ObjData);
@@ -169,19 +169,19 @@ void MyServer::MessageHandler(ClientManager *client, QByteArray socketData){
          list.clear();
 
         break;
-    case (LOGOUT):
+    case (MessageTypes::Logout):
         qDebug("LOGOUT request\n");
         //il messaggio di logout contiene solo il type LOGOUT
         db->logout(client);
         break;
-    case (REGISTER): {
+    case (MessageTypes::Register): {
         /*
         list[0]: username
         list[1]: password
         list[2]: email
         list[3]: img
          */
-        qDebug("REGISTER request\n");
+        qDebug("MessageTypes::Register request\n");
         list = Serialize::userUnserialize(ObjData);
         db->registration(list.at(0), list.at(2), list.at(1), list.at(3), client);
 
@@ -189,11 +189,11 @@ void MyServer::MessageHandler(ClientManager *client, QByteArray socketData){
 
         break;
     }
-    case (FILENAME):
+    case (MessageTypes::Filename):
         qDebug("FILENAME request\n");
 
         break;
-    case (MESSAGE):
+    case (MessageTypes::SymbolMessage):
         qDebug("MESSAGE request");
         db->forwardMessage(client, ObjData, socketData);
 
@@ -203,22 +203,22 @@ void MyServer::MessageHandler(ClientManager *client, QByteArray socketData){
         //f->messageHandler(socket, fileid_message.second, socketData);
 
         break;
-    case (TEXT):
+    case (MessageTypes::Text):
         qDebug("TEXT request\n");
 
         break;
-    case (IMAGE):
+    case (MessageTypes::Image):
         qDebug("IMAGE request\n");
 
         break;
-    case (NEWFILE):
+    case (MessageTypes::NewFile):
         qDebug("NEWFILE request\n");
         filename = Serialize::newFileUnserialize(ObjData);
 
         db->createFile(filename, client);
 
         break;
-    case (OPEN):{
+    case (MessageTypes::Open):{
         qDebug("OPEN request\n");
         fileId = Serialize::openDeleteFileUnserialize(ObjData);
 
@@ -226,7 +226,7 @@ void MyServer::MessageHandler(ClientManager *client, QByteArray socketData){
 
         break;
     }
-    case (CLOSE):
+    case (MessageTypes::Close):
         qDebug("CLOSE request\n");
         close = Serialize::closeFileUnserialize(ObjData);
 
@@ -235,7 +235,7 @@ void MyServer::MessageHandler(ClientManager *client, QByteArray socketData){
         db->closeFile(close.first, close.second, client);
 
         break;
-    case (CURSOR):{
+    case (MessageTypes::CursorPosition):{
         qDebug("CURSOR request");
         QPair<int, Message> m = Serialize::messageUnserialize(ObjData);
         File* f = db->getFile(m.first);
@@ -243,18 +243,18 @@ void MyServer::MessageHandler(ClientManager *client, QByteArray socketData){
 
         break;
     }
-    case (SERVER_ANSWER):
+    case (MessageTypes::ServerAnswer):
         qDebug("SERVER_ANSWER request\n");
 
         break;
-    case (DELETE):
+    case (MessageTypes::Delete):
         qDebug("DELETE request\n");
         fileId = Serialize::openDeleteFileUnserialize(ObjData);
 
         db->deleteFile(fileId, client);
 
         break;
-    case (RENAME):
+    case (MessageTypes::Rename):
         qDebug("RENAME request\n");
         rename = Serialize::renameFileUnserialize(ObjData);
 
@@ -262,7 +262,7 @@ void MyServer::MessageHandler(ClientManager *client, QByteArray socketData){
 
         break;
 
-    case (SHARE):
+    case (MessageTypes::Share):
         qDebug("SHARE request\n");
         fileId = Serialize::openDeleteFileUnserialize(ObjData); //uso questa funzione perche ritorna l'id del file
 
@@ -270,7 +270,7 @@ void MyServer::MessageHandler(ClientManager *client, QByteArray socketData){
         db->getURIToShare(fileId, client);
 
         break;
-    case (ACQUIRE_SHARED_FILE):
+    case (MessageTypes::AcquireSharedFile):
         qDebug("ACQUIRE_SHARED_FILE request\n");
 
         URI = Serialize::sharedFileAcquisitionUnserialize(ObjData);
@@ -278,13 +278,13 @@ void MyServer::MessageHandler(ClientManager *client, QByteArray socketData){
         db->SharedFileAcquisition(URI, client);
 
         break;
-    case (SEND_FILES):
+    case (MessageTypes::SendFiles):
         qDebug("SEND_FILES request\n");
 
         db->sendFileList(client);
 
         break;
-    case (CHANGE_PASSWORD):
+    case (MessageTypes::ChangePassword):
         qDebug("CHANGE_PASSWORD request\n");
         list = Serialize::changePasswordUnserialize(ObjData);
 
@@ -293,7 +293,7 @@ void MyServer::MessageHandler(ClientManager *client, QByteArray socketData){
         list.clear();
 
         break;
-    case (CHANGE_PROFILE):
+    case (MessageTypes::ChangeProfile):
         qDebug("CHANGE_PROFILE request\n");
         list = Serialize::changeProfileUnserialize(ObjData);
 

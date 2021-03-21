@@ -18,7 +18,7 @@
 #include <QRegularExpression>
 
 #include "../Serialize/Serialize.h"
-#include "../Serialize/define.h"
+#include "../Serialize/MessageTypes.h"
 #include "../File/file.h"
 #include "../ClientManager/clientmanager.h"
 

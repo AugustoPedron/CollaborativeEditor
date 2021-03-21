@@ -48,7 +48,7 @@ void File::messageHandler(ClientManager* sender, Message m, QByteArray bytes)
         afterInsert = false;
     }
 
-    CursorPosition CP(pos, afterInsert);
+    CursorPos CP(pos, afterInsert);
 
     if(m_usersCursorPosition.find(sender) != m_usersCursorPosition.end()){
         m_usersCursorPosition[sender] = CP;
@@ -88,7 +88,7 @@ void File::sendNewFile(ClientManager* socket)
         __int64 start = std::time(nullptr);
         int i = 1;
 		for (auto m : msgs) {
-            QByteArray bytes = Serialize::fromObjectToArray(Serialize::messageSerialize(this->id, m, MESSAGE));
+            QByteArray bytes = Serialize::fromObjectToArray(Serialize::messageSerialize(this->id, m, MessageTypes::SymbolMessage));
             socket->writeData(bytes); 
             //qDebug()<< bytes.size();
             maybeSleep(i);
@@ -111,7 +111,7 @@ void File::sendNewFile(ClientManager* socket)
                 //socket->writeData(bytes);
             }
         }
-        m_usersCursorPosition.insert(socket, CursorPosition(this->handler->getFirstPosition(), false));
+        m_usersCursorPosition.insert(socket, CursorPos(this->handler->getFirstPosition(), false));
 	}
 }
 
@@ -143,9 +143,9 @@ void File::addUser(ClientManager* user)
 		//this->users.append(user);
         for(auto it = users.begin(); it != users.end(); it++){
             if((*it)->getId() != user->getId()){
-                QByteArray message = Serialize::fromObjectToArray(Serialize::addEditingUserSerialize(user->getId(), user->getUsername(), user->getColor(), this->id, NEWEDITINGUSER));
+                QByteArray message = Serialize::fromObjectToArray(Serialize::addEditingUserSerialize(user->getId(), user->getUsername(), user->getColor(), this->id, MessageTypes::NewEditingUser));
                 (*it)->writeData(message);
-                message = Serialize::fromObjectToArray(Serialize::addEditingUserSerialize((*it)->getId(), (*it)->getUsername(), (*it)->getColor(), this->id, NEWEDITINGUSER));
+                message = Serialize::fromObjectToArray(Serialize::addEditingUserSerialize((*it)->getId(), (*it)->getUsername(), (*it)->getColor(), this->id, MessageTypes::NewEditingUser));
                 user->writeData(message);
             }
         }
@@ -164,7 +164,7 @@ void File::removeUser(ClientManager* user)
     m_usersCursorPosition.remove(user);
     for(auto it = users.begin(); it != users.end(); it++){
         if((*it)->getId() != user->getId()){
-            QByteArray message = Serialize::fromObjectToArray(Serialize::removeEditingUserSerialize(user->getId(), this->id, REMOVEEDITINGUSER));
+            QByteArray message = Serialize::fromObjectToArray(Serialize::removeEditingUserSerialize(user->getId(), this->id, MessageTypes::RemoveEditingUser));
             (*it)->writeData(message);
         }
     }

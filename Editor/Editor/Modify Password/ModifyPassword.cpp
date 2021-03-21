@@ -57,7 +57,7 @@ void ModifyPassword::on_okButton_clicked() {
 				resultDialog.setInformativeText("Errore di connessione");
 				resultDialog.exec();
 			}*/
-			emit dataToSend(m_serializeInstance->changePasswordSerialize(oldPassword, newPassword, CHANGE_PASSWORD));
+			emit dataToSend(m_serializeInstance->changePasswordSerialize(oldPassword, newPassword, MessageTypes::ChangePassword));
 		}
 		else {
 			QMessageBox::warning(this, "ModifyPassword", "Password non coincidenti!");

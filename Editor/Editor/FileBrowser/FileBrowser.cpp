@@ -22,7 +22,7 @@ FileBrowser::FileBrowser(QSharedPointer<SocketHandler> socketHandler, QSharedPoi
 	connect(ui.fileList, &QListWidget::itemSelectionChanged, this, &FileBrowser::on_file_clicked);
 	connect(ui.uriLineEdit, &QLineEdit::textChanged, this, &FileBrowser::on_URI_set);
 
-	QByteArray message = m_serializeInstance->requestFileList(SEND_FILES);
+	QByteArray message = m_serializeInstance->requestFileList(MessageTypes::SendFiles);
 	//m_socketHandler->writeData(message);
 	emit dataToSend(message);
 }
@@ -52,7 +52,7 @@ void FileBrowser::on_fileList_itemDoubleClicked(QListWidgetItem* item) {
 			int id = item->data(Qt::UserRole).toInt();
 			editor = new Editor(m_socketHandler, m_profileImage, m_userColor, filename, username, id, clientID);
 			m_textEditors.insert(std::pair<int, Editor*>(id, editor));
-			QByteArray data = m_serializeInstance->openDeleteFileSerialize(id, OPEN);
+			QByteArray data = m_serializeInstance->openDeleteFileSerialize(id, MessageTypes::Open);
 			//this->m_socketHandler->writeData(data);
 			emit dataToSend(data);
 		}
@@ -81,7 +81,7 @@ void FileBrowser::on_newFile_clicked() {
 		"New Text File", &ok);
 	if (ok && !filename.isEmpty()) {
 		//send to server
-		QByteArray data = m_serializeInstance->newFileSerialize(filename, NEWFILE);
+		QByteArray data = m_serializeInstance->newFileSerialize(filename, MessageTypes::NewFile);
 		//this->m_socketHandler->writeData(data);
 		//emit dataToSend(data);
 		addFile(filename);
@@ -151,7 +151,7 @@ void FileBrowser::on_renameFile_clicked()
 	if (ok && !new_filename.isEmpty()) {
 		//send to server
 		if (new_filename != filename) {
-			QByteArray data = m_serializeInstance->renameFileSerialize(id, new_filename, RENAME);
+			QByteArray data = m_serializeInstance->renameFileSerialize(id, new_filename, MessageTypes::Rename);
 			//this->m_socketHandler->writeData(data);
 			emit dataToSend(data);
 			current_item->setText(new_filename);
@@ -169,7 +169,7 @@ void FileBrowser::on_renameFile_clicked()
 }
 
 void FileBrowser::closeEvent(QCloseEvent* event) {
-	QByteArray message = m_serializeInstance->logoutUserSerialize(LOGOUT);
+	QByteArray message = m_serializeInstance->logoutUserSerialize(MessageTypes::Logout);
 	//m_socketHandler->writeData(message);
 	emit dataToSend(message);
 	qApp->quit();
@@ -189,12 +189,12 @@ void FileBrowser::removeBlank()
 void FileBrowser::on_logoutButton_clicked() {
 	disconnect(m_socketHandler.get(), &SocketHandler::dataReceived, this, &FileBrowser::handleNewMessage);
 	for (auto el : this->m_textEditors) {
-		QByteArray data = m_serializeInstance->closeFileSerialize(el.first, el.second->getSiteCounter_(), CLOSE);
+		QByteArray data = m_serializeInstance->closeFileSerialize(el.first, el.second->getSiteCounter_(), MessageTypes::Close);
 		emit dataToSend(data);
 		el.second->deleteLater();
 	}
 	m_textEditors.clear();
-	QByteArray message = m_serializeInstance->logoutUserSerialize(LOGOUT);
+	QByteArray message = m_serializeInstance->logoutUserSerialize(MessageTypes::Logout);
 	//m_socketHandler->writeData(message);
 	emit dataToSend(message);
 	emit showParent();
@@ -231,10 +231,10 @@ void FileBrowser::childWindowClosedAndUpdate(QString m_username, QString m_email
 void FileBrowser::editorClosed(int fileId, int siteCounter) {
 	Editor* editor = m_textEditors.at(fileId);
 	editor->deleteLater();
-	QByteArray message = m_serializeInstance->removeEditingUserSerialize(this->clientID, fileId, REMOVEEDITINGUSER);
+	QByteArray message = m_serializeInstance->removeEditingUserSerialize(this->clientID, fileId, MessageTypes::RemoveEditingUser);
 	//m_socketHandler->writeData(message);
 	emit dataToSend(message);
-	QByteArray data = m_serializeInstance->closeFileSerialize(fileId, siteCounter, CLOSE);
+	QByteArray data = m_serializeInstance->closeFileSerialize(fileId, siteCounter, MessageTypes::Close);
 	//this->m_socketHandler->writeData(data);
 	emit dataToSend(data);
 	filename_id.remove(fileId);
@@ -295,17 +295,17 @@ void FileBrowser::handleNewMessage(QJsonObject message)
 
 	switch (type)
 	{
-	case MESSAGE:
+	case MessageTypes::SymbolMessage:
 		processEditorMessage(message);
 		break;
-	case SEND_FILES:
+	case MessageTypes::SendFiles:
 		addFiles(message);
 		break;
-	case NEWFILE:
+	case MessageTypes::NewFile:
 		addFile(message);
 		break;
 
-	case NEWEDITINGUSER: {
+	case MessageTypes::NewEditingUser: {
 		QPair<int, QStringList> fileUserInfo = m_serializeInstance->addEditingUserUnserialize(message);
 		auto it = m_textEditors.find(fileUserInfo.first);
 		if (it != m_textEditors.end()) {
@@ -313,7 +313,7 @@ void FileBrowser::handleNewMessage(QJsonObject message)
 		}
 		break;
 	}
-	case REMOVEEDITINGUSER: {
+	case MessageTypes::RemoveEditingUser: {
 		QPair<int, int> userToRemove = m_serializeInstance->removeEditingUserUnserialize(message);
 		auto it = m_textEditors.find(userToRemove.first);
 		if (it != m_textEditors.end()) {
@@ -321,7 +321,7 @@ void FileBrowser::handleNewMessage(QJsonObject message)
 		}
 		break;
 	}
-	case SERVER_ANSWER: {
+	case MessageTypes::ServerAnswer: {
 		if (m_openAfterUri) {
 			m_timer->stop();
 			m_openAfterUri = false;
@@ -332,7 +332,7 @@ void FileBrowser::handleNewMessage(QJsonObject message)
 		}
 		break;
 	}
-	case SHARE: {
+	case MessageTypes::Share: {
 		//funzione per mostrare uri
 		showURI(message);
 		/*QStringList serverMessage = m_serializeInstance->responseUnserialize(message);
@@ -342,7 +342,7 @@ void FileBrowser::handleNewMessage(QJsonObject message)
 		break;
 
 	}
-	case SITECOUNTER: {
+	case MessageTypes::SiteCounter: {
 		QPair<int, int> fileId_siteCounter = m_serializeInstance->siteCounterUnserialize(message);
 		auto it = m_textEditors.find(fileId_siteCounter.first);
 		if (it != m_textEditors.end()) {
@@ -350,7 +350,7 @@ void FileBrowser::handleNewMessage(QJsonObject message)
 		}
 		break;
 	}
-	case RENAME: {
+	case MessageTypes::Rename: {
 		QStringList list = m_serializeInstance->renameFileUnserialize(message);
 
 		QString oldName = list.at(0);
@@ -443,7 +443,7 @@ void FileBrowser::on_URI_set() {
 void FileBrowser::on_addSharedFileButton_clicked() {
 	QString uri = ui.uriLineEdit->text();
 	if (uri != "") {
-		QByteArray message = m_serializeInstance->openSharedFileSerialize(uri, OPENSHARE);
+		QByteArray message = m_serializeInstance->openSharedFileSerialize(uri, MessageTypes::OpenShare);
 		//bool result = m_socketHandler->writeData(message);
 		emit dataToSend(message);
 		//if (result) {

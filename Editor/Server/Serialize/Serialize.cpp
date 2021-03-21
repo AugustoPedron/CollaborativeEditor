@@ -17,7 +17,7 @@ QJsonObject Serialize::userSerialize(QString username, QString email, QString pa
     - user: stringa che contiene lo username
     - password: stringa che contiene la password
     - nickname: stringa he contiene il nickname, questa stringa serve solo durante il sign-up viene ignorata se serializzo un messagio di tipo login
-    - type: intero che basandomi sul file define.h mi dice cosa devo fare, i tipi che possono esere passati qui sono LOGIN O REGISER(singup)
+    - type: intero che basandomi sul file MessageTypes.h mi dice cosa devo fare, i tipi che possono esere passati qui sono LOGIN O REGISER(singup)
     RETURN:
     - una Qstring che contiene il tutto serializzano come QJson e terminata con \r\n-> vedere se serve effettivamente altrimenti eliminare
     */
@@ -27,7 +27,7 @@ QJsonObject Serialize::userSerialize(QString username, QString email, QString pa
     obj.insert("user", QJsonValue(username));
     obj.insert("password", QJsonValue(password));
 
-    if (type == REGISTER) {
+    if (type == MessageTypes::Register) {
         //l'email serve solo in fase di register per salvarlo sul server
         obj.insert("email", QJsonValue(email));
         obj.insert("img", Serialize::jsonValFromPixmap(profileImage));
@@ -53,7 +53,7 @@ QStringList Serialize::userUnserialize(QJsonObject obj)
     -->lunghezza 2 se LOGIN:
         list[0]: username
         list[1]: password
-    -->lunghezza 3 se REGISTER:
+    -->lunghezza 3 se MessageTypes::Register:
         list[0]: username
         list[1]: password
         list[2]: email
@@ -69,7 +69,7 @@ QStringList Serialize::userUnserialize(QJsonObject obj)
     list.append(usr);
     list.append(password);
 
-    if (Serialize::actionType(obj) == REGISTER) {
+    if (Serialize::actionType(obj) == MessageTypes::Register) {
         QString email = obj.value("email").toString();
         QString img = obj.value("img").toString();
 
@@ -90,7 +90,7 @@ QJsonObject Serialize::FileListSerialize(QMap<int, QString> files, int type){
     INPUT:
     - username: stringa che contiene il nome dell'utente;
     - files: array serializzato contenente i campi(filename e id) per ogni file posseduto dal singolo client;
-    - type: intero che Ã¨ definito in define.h come SEND_FILES
+    - type: intero che Ã¨ definito in MessageTypes.h come SEND_FILES
     RETURN:
     - files: l'array che viene man mano aggiornato ad ogni chiamata.
     */
@@ -164,7 +164,7 @@ QJsonObject Serialize::openDeleteFileSerialize(int fileId, int type)
     Questa funzione serializza l'id del file quando vuole fare un OPEN o CLOSE o DELETE, cio e' discriminato dal valore di type
     INPUT:
     - fileId: intero che contiene l'id del file
-    - type: intero che basandomi sul file define.h mi dice cosa devo fare, i tipi che possono esere passati qui sono OPEN O CLOSE O DELETE
+    - type: intero che basandomi sul file MessageTypes.h mi dice cosa devo fare, i tipi che possono esere passati qui sono OPEN O CLOSE O DELETE
     RETURN:
     - una Qstring che contiene il tutto serializzano come QJson
     */
@@ -196,7 +196,7 @@ QJsonObject Serialize::newFileSerialize(QString filename,int id, int type){
     Questa funzione serializza lil nome del file quando vuole fare una NEW, cio e' discriminato dal valore di type
     INPUT:
     - filename: stringa che contiene il nome del file da creare
-    - type: intero che basandomi sul file define.h mi dice cosa devo fare, il tipo che può esere passato qui è
+    - type: intero che basandomi sul file MessageTypes.h mi dice cosa devo fare, il tipo che può esere passato qui è
     RETURN:
     - una Qstring che contiene il tutto serializzano come QJson
     */
@@ -220,7 +220,7 @@ QJsonObject Serialize::renameFileSerialize(QString oldName, QString newName, int
     INPUT:
     - fileId: stringa che contiene l'id del file da rinominare
     -newName: nuovo nome da dare al file
-    - type: intero che basandomi sul file define.h mi dice cosa devo fare, il tipo che può esere passato qui è RENAME
+    - type: intero che basandomi sul file MessageTypes.h mi dice cosa devo fare, il tipo che può esere passato qui è RENAME
     RETURN:
     - una Qstring che contiene il tutto serializzano come QJson
     */
@@ -248,7 +248,7 @@ QJsonObject Serialize::sharedFileAcquisitionSerialize(QString URI, int type){
     Questa funzione serializza l'URI del file e l'utente che l'ha ricevuto e lo sta provando ad aprire, in caso di una SHARE( cio e' discriminato dal valore di type)
     INPUT:
     - URI: stringa che contiene l'URI del file da condividere
-    - type: intero che basandomi sul file define.h mi dice cosa devo fare, il tipo che può esere passato qui è SHARE
+    - type: intero che basandomi sul file MessageTypes.h mi dice cosa devo fare, il tipo che può esere passato qui è SHARE
     RETURN:
     - una Qstring che contiene il tutto serializzano come QJson
     */
@@ -269,7 +269,7 @@ QJsonObject Serialize::changePasswordSerialize(QString oldPassword, QString newP
     INPUT:
     - oldPassword: stringa che contiene la vecchia password
     - newPassword: nuova password
-    - type: intero che basandomi sul file define.h mi dice cosa devo fare, il tipo che può esere passato qui è SHARE
+    - type: intero che basandomi sul file MessageTypes.h mi dice cosa devo fare, il tipo che può esere passato qui è SHARE
     RETURN:
     - una Qstring che contiene il tutto serializzano come QJson
     */
@@ -363,7 +363,7 @@ QJsonObject Serialize::messageSerialize(int fileId, Message message, int type)
     ossia insert/delte/style etc--> queste informazioni non sono contunte nel file json ma nel messaggio stesso
     INPUT:
     - message: messaggio che contiene il symbolo, cosa fare e tutte le informazioni necessarie
-    - type: intero che basandomi sul file define.h mi dice cosa devo fare, qui Ã¨ accettato solo il tipo MESSAGE che indica sul client di inviare un messaggio
+    - type: intero che basandomi sul file MessageTypes.h mi dice cosa devo fare, qui Ã¨ accettato solo il tipo MESSAGE che indica sul client di inviare un messaggio
      e sul server di inoltrarlo ad altri client connessi ed insieme aggiornareil crdt locale sul server
     RETURN:
     - una Qstring che contiene il tutto serializzano come QJson e terminata con \r\n-> vedere se serve effettivamente altrimenti eliminare
@@ -695,7 +695,7 @@ QJsonObject Serialize::cursorPostionSerialize(int position, int userID, int type
     INPUT:
     - position: posizione relativa del cursore all'interno del documento
     - userID : ID univoco legato ad un det client che midice a quale account mi sto riferendo
-    - type: intero che basandomi sul file define.h mi dice cosa devo fare, qui e' accettato solo il tipo CURSOR
+    - type: intero che basandomi sul file MessageTypes.h mi dice cosa devo fare, qui e' accettato solo il tipo CURSOR
     RETURN:
     - una Qstring che contiene il tutto serializzano come QJson e terminata con \r\n-> vedere se serve effettivamente altrimenti eliminare
 */

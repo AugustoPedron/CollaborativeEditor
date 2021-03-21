@@ -71,7 +71,7 @@
     <ClInclude Include="File\file.h">
       <Filter>File</Filter>
     </ClInclude>
-    <ClInclude Include="Serialize\define.h">
+    <ClInclude Include="Serialize\MessageTypes.h">
       <Filter>Serialize</Filter>
     </ClInclude>
     <ClInclude Include="Serialize\Serialize.h">

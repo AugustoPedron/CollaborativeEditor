@@ -16,7 +16,7 @@
     <ClInclude Include="CRDT\Message.h" />
     <ClInclude Include="CRDT\Symbol.h" />
     <ClInclude Include="Editor\UserInterval.h" />
-    <ClInclude Include="Serialization\define.h" />
+    <ClInclude Include="Serialization\MessageTypes.h" />
     <QtMoc Include="SocketHandler\SocketHandler.h" />
     <QtMoc Include="Serialization\Serialize.h" />
     <QtMoc Include="NewAccount\NewAccount.h" />

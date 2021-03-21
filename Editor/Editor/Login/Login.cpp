@@ -51,7 +51,7 @@ void Login::on_loginButton_clicked()
 	m_username = ui.usernameTextLine->text();
 	QString password = ui.passwordTextLine->text();
 	if (m_username != "" && password != "") {
-		QByteArray message = m_serializeInstance->userSerialize(m_username, password, m_username, LOGIN);
+		QByteArray message = m_serializeInstance->userSerialize(m_username, password, m_username, MessageTypes::LoginRequest);
 		//m_socketHandler->writeData(message);
 		emit dataToSend(message);
 		//loginResult(message);

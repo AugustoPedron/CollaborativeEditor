@@ -121,7 +121,7 @@ void ModifyProfile::on_submit_clicked() {
 			//	resultDialog.setInformativeText("Errore di connessione");
 			//	resultDialog.exec();
 			//}
-			emit dataToSend(m_serializeInstance->changeProfileSerialize(this->m_username, newUser, this->m_email, newEmail, m_croppedImage, CHANGE_PROFILE));
+			emit dataToSend(m_serializeInstance->changeProfileSerialize(this->m_username, newUser, this->m_email, newEmail, m_croppedImage, MessageTypes::ChangeProfile));
 			//QMessageBox::information(this, "NewAccount", "New Account Created");
 		}
 		else {

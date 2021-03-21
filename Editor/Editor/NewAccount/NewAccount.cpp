@@ -91,7 +91,7 @@ void NewAccount::on_submit_clicked() {
 	QString email = ui.emailLine->text();
 	if (username != "" && email != "") {
 		if (password.compare(password_re) == 0) {
-			QByteArray userInfoSerialized = m_serializeInstance->userSerialize(username, password, email, REGISTER, m_croppedImage); //ilio
+			QByteArray userInfoSerialized = m_serializeInstance->userSerialize(username, password, email, MessageTypes::Register, m_croppedImage); //ilio
 			//bool result = m_socketHandler->writeData(userInfoSerialized);
 			//if (result) {
 			//	m_timer->setSingleShot(true);

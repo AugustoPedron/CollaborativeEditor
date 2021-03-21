@@ -509,7 +509,7 @@ void Editor::filePrintPdf() {
 //funzione atta a creare un link per la condivisione di un file, da connettere al tasto share
 void Editor::shareLink() {
 	
-	QByteArray msg = m_SerializeInstance->openDeleteFileSerialize(m_fileId, SHARE);
+	QByteArray msg = m_SerializeInstance->openDeleteFileSerialize(m_fileId, MessageTypes::Share);
 	m_textEdit->setFocus();
 	emit dataToSend(msg);
 
@@ -551,7 +551,7 @@ void Editor::localInsert() {
 		dim--;
 
 		//m_socketHandler->writeData(m_SerializeInstance->fromObjectToArray(packet)); // -> socket
-		emit dataToSend(m_SerializeInstance->messageSerialize(m, m_fileId, MESSAGE));
+		emit dataToSend(m_SerializeInstance->messageSerialize(m, m_fileId, MessageTypes::SymbolMessage));
 
 		//std::string prova = m.getSymbol().getFont().toString().toStdString();
 		//std::cout << "prova" << std::endl;
@@ -606,7 +606,7 @@ void Editor::localDelete() {
 		dim--;
 
 		//m_socketHandler->writeData(m_SerializeInstance->fromObjectToArray(packet)); // -> socket
-		emit dataToSend(m_SerializeInstance->messageSerialize(m, m_fileId, MESSAGE));
+		emit dataToSend(m_SerializeInstance->messageSerialize(m, m_fileId, MessageTypes::SymbolMessage));
 	}
 
 	QScrollBar* SB = m_textEdit->verticalScrollBar();
@@ -947,7 +947,7 @@ void Editor::localStyleChange()
 			//scrivo sul socket solo se c'e stato un vero cambio --> meno banda e carico per il server
 			Message m = m_CRDT->localChange(pos, chr, font, color, alignment);
 			//m_socketHandler->writeData(m_SerializeInstance->fromObjectToArray(packet)); // -> socket
-			emit dataToSend(m_SerializeInstance->messageSerialize(m, m_fileId, MESSAGE));
+			emit dataToSend(m_SerializeInstance->messageSerialize(m, m_fileId, MessageTypes::SymbolMessage));
 		}
 
 	}
