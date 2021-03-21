@@ -1,9 +1,10 @@
 #pragma once
 
-#include <QtWidgets/QMainWindow>
+#include <QMainWindow>
 #include <QCloseEvent>
 #include <QMessageBox>
 #include <QThread>
+
 #include "ui_Login.h"
 #include "../FileBrowser/FileBrowser.h"
 #include "../NewAccount/NewAccount.h"
@@ -15,8 +16,7 @@ class Login : public QMainWindow
 	Q_OBJECT
 
 public:
-	Login(QWidget* parent = Q_NULLPTR);
-	Login(QWidget* parent);
+	Login(QMainWindow* parent = Q_NULLPTR);
 	~Login();
 
 private:
@@ -26,7 +26,7 @@ private:
 	QThread* m_thread;
 	QString m_username;
 	QString m_email;
-	Ui::LoginClass ui;
+	Ui::Login ui;
 	FileBrowser* m_fileBrowserWindow;
 	NewAccount* m_newAccountWindow;
 	QSharedPointer<SocketHandler> m_socketHandler;

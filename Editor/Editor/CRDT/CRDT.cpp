@@ -86,6 +86,8 @@ __int64 CRDT::insert_symbol(Symbol symbol)
 		m_remoteUserCursorPos[symbol.getId()[0]] = m_symbols.end();
 	else
 		m_remoteUserCursorPos[symbol.getId()[0]]++;
+
+	return 0;
 }
 
 __int64 CRDT::delete_symbol(Symbol symbol)
@@ -124,8 +126,11 @@ __int64 CRDT::delete_symbol(Symbol symbol)
 	}
 
 	m_symbols.erase(--it);
+
 	if(!beginFlag)
 		m_remoteUserCursorPos[symbol.getId()[0]]--;
+
+	return 0;
 }
 __int64 CRDT::change_symbol(Symbol symbol) {
 	//__int64 index;
@@ -154,6 +159,8 @@ __int64 CRDT::change_symbol(Symbol symbol) {
 		(it)->setColor(symbol.getColor());
 		(it)->setAlignment(symbol.getAlignment());
 	}
+
+	return 0;
 }
 
 __int64 CRDT::process(const Message& m)

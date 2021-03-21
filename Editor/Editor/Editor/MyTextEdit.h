@@ -35,7 +35,7 @@ public:
     void moveBackwardCursorsPosition(int mainCursorPosition, int offsetPosition);
     inline int getCursorPos(int id) { return m_cursorsToPrint.at(id)->getCursorPosition(); }
     void refresh(QKeyEvent* e);
-    inline __int64 getEffectiveCursorPosition(std::vector<int> cursorPositionInCRDT) { return m_crdt->getCursorPosition(cursorPositionInCRDT); }
+    inline __int64 getEffectiveCursorPosition(std::vector<int> cursorPositionInCRDT) { return m_crdt->convertIteratorToIntPos(m_crdt->getCursorPosition(cursorPositionInCRDT)); }
 
 private:
 

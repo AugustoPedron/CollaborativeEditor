@@ -132,22 +132,22 @@ void Editor::setCurrentFile(const QString& fileName) {
 }
 
 bool Editor::maybeSave() {
-	//if (!m_textEdit->document()->isModified())
-	//	return true;
-	//const QMessageBox::StandardButton ret
-	//	= QMessageBox::warning(this, tr("Application"),
-	//		tr("The document has been modified.\n"
-	//			"Do you want to save your changes?"),
-	//		QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-	//switch (ret) {
-	//case QMessageBox::Save:
-	//	//return save();
-	//case QMessageBox::Cancel:
-	//	return false;
-	//default:
-	//	break;
-	//}
-	//return true;
+	if (!m_textEdit->document()->isModified())
+		return true;
+	const QMessageBox::StandardButton ret
+		= QMessageBox::warning(this, tr("Application"),
+			tr("The document has been modified.\n"
+				"Do you want to save your changes?"),
+			QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+	switch (ret) {
+	case QMessageBox::Save:
+		//return save();
+	case QMessageBox::Cancel:
+		return false;
+	default:
+		break;
+	}
+	return true;
 }
 
 void Editor::createActions() {
@@ -509,8 +509,7 @@ void Editor::filePrintPdf() {
 //funzione atta a creare un link per la condivisione di un file, da connettere al tasto share
 void Editor::shareLink() {
 	
-	QJsonObject obj = m_SerializeInstance->openDeleteFileSerialize(m_fileId, SHARE);
-	QByteArray msg = m_SerializeInstance->fromObjectToArray(obj);
+	QByteArray msg = m_SerializeInstance->openDeleteFileSerialize(m_fileId, SHARE);
 	m_textEdit->setFocus();
 	emit dataToSend(msg);
 
@@ -546,15 +545,13 @@ void Editor::localInsert() {
 		Qt::AlignmentFlag alignment = this->getAlignementFlag(m_textEdit->alignment());
 
 		Message m = m_CRDT->localInsert(pos, chr, font, color, alignment);
-		QJsonObject packet = m_SerializeInstance->messageSerialize(m, m_fileId, MESSAGE);
-
 
 		//mandare solo un tot alla volta--> 50 caratteri e poi sleep per tot millisecondi
 		maybeSleep(dim);
 		dim--;
 
 		//m_socketHandler->writeData(m_SerializeInstance->fromObjectToArray(packet)); // -> socket
-		emit dataToSend(m_SerializeInstance->fromObjectToArray(packet));
+		emit dataToSend(m_SerializeInstance->messageSerialize(m, m_fileId, MESSAGE));
 
 		//std::string prova = m.getSymbol().getFont().toString().toStdString();
 		//std::cout << "prova" << std::endl;
@@ -603,14 +600,13 @@ void Editor::localDelete() {
 	for (int i = end; i > start; i--) {
 
 		Message m = m_CRDT->localErase(i - 1);
-		QJsonObject packet = m_SerializeInstance->messageSerialize(m, m_fileId, MESSAGE);
 
 
 		maybeSleep(dim);
 		dim--;
 
 		//m_socketHandler->writeData(m_SerializeInstance->fromObjectToArray(packet)); // -> socket
-		emit dataToSend(m_SerializeInstance->fromObjectToArray(packet));
+		emit dataToSend(m_SerializeInstance->messageSerialize(m, m_fileId, MESSAGE));
 	}
 
 	QScrollBar* SB = m_textEdit->verticalScrollBar();
@@ -950,9 +946,8 @@ void Editor::localStyleChange()
 
 			//scrivo sul socket solo se c'e stato un vero cambio --> meno banda e carico per il server
 			Message m = m_CRDT->localChange(pos, chr, font, color, alignment);
-			QJsonObject packet = m_SerializeInstance->messageSerialize(m, m_fileId, MESSAGE);
 			//m_socketHandler->writeData(m_SerializeInstance->fromObjectToArray(packet)); // -> socket
-			emit dataToSend(m_SerializeInstance->fromObjectToArray(packet));
+			emit dataToSend(m_SerializeInstance->messageSerialize(m, m_fileId, MESSAGE));
 		}
 
 	}
@@ -1073,7 +1068,7 @@ void Editor::insertImage() {
 		imageFormat.setHeight(image.height());
 		imageFormat.setName(uri.toString());
 		cursor.insertImage(imageFormat);
-		QJsonObject imageSerialized = m_SerializeInstance->imageSerialize(image, 2);
+		//QJsonObject imageSerialized = m_SerializeInstance->imageSerialize(image, 2);
 		//serve un messaggio che abbia anche la posizione del cursore per l'immagine, oltre che il ridimensionamento
 	}
 }
@@ -1237,7 +1232,7 @@ void Editor::updateCursorPosition(bool isSelection) {
 	QTextCursor TC = m_textEdit->textCursor();
 	Cursor c = m_CRDT->getCursorPosition(TC.position());
 	//m_socketHandler->writeData(m_SerializeInstance->fromObjectToArray(m_SerializeInstance->messageSerialize(m, m_fileId, MESSAGE)));
-	emit dataToSend(m_SerializeInstance->fromObjectToArray(m_SerializeInstance->messageSerialize(c, m_fileId, MESSAGE)));
+	//emit dataToSend(m_SerializeInstance->fromObjectToArray(m_SerializeInstance->messageSerialize(c, m_fileId, MESSAGE)));
 }
 
 void Editor::showHideUsersIntervals() {

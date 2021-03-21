@@ -1,6 +1,6 @@
 #include "Login.h"
 
-Login::Login(QWidget* parent)
+Login::Login(QMainWindow* parent)
 	: QMainWindow(parent),
 	m_socketHandler(QSharedPointer<SocketHandler>(new SocketHandler())),
 	m_timer(QSharedPointer<QTimer>(new QTimer(this))), m_thread(new QThread(this))

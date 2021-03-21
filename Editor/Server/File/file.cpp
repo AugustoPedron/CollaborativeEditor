@@ -44,7 +44,7 @@ void File::messageHandler(ClientManager* sender, Message m, QByteArray bytes)
         //if(m.getAction() == DELETE_SYMBOL) pos--;
     }
     else{
-        pos = m.getCursorPosition();
+        //pos = m.getCursorPosition();
         afterInsert = false;
     }
 
@@ -106,9 +106,9 @@ void File::sendNewFile(ClientManager* socket)
                 else {
                     pos = it.value().pos;
                 }
-                Message cursorPosition(pos, CURSOR_S, it.key()->getId());
-                QByteArray bytes = Serialize::fromObjectToArray(Serialize::messageSerialize(this->id, cursorPosition, MESSAGE));
-                socket->writeData(bytes);
+                //Message cursorPosition(pos, CURSOR_S, it.key()->getId());
+                //QByteArray bytes = Serialize::fromObjectToArray(Serialize::messageSerialize(this->id, cursorPosition, MESSAGE));
+                //socket->writeData(bytes);
             }
         }
         m_usersCursorPosition.insert(socket, CursorPosition(this->handler->getFirstPosition(), false));

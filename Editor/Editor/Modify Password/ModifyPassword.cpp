@@ -44,7 +44,6 @@ void ModifyPassword::on_okButton_clicked() {
 
 	if (oldPassword != "" && newPassword != "" && confirmPassword != "") {
 		if (newPassword.compare(confirmPassword) == 0) {
-			QJsonObject passwordSerialize = m_serializeInstance->changePasswordSerialize(oldPassword, newPassword, CHANGE_PASSWORD); 
 			//bool result = m_socketHandler->writeData(m_serializeInstance->fromObjectToArray(passwordSerialize)); //da risultato falso questo perchè?
 
 			/*if (result) {
@@ -58,7 +57,7 @@ void ModifyPassword::on_okButton_clicked() {
 				resultDialog.setInformativeText("Errore di connessione");
 				resultDialog.exec();
 			}*/
-			emit dataToSend(m_serializeInstance->fromObjectToArray(passwordSerialize));
+			emit dataToSend(m_serializeInstance->changePasswordSerialize(oldPassword, newPassword, CHANGE_PASSWORD));
 		}
 		else {
 			QMessageBox::warning(this, "ModifyPassword", "Password non coincidenti!");

@@ -13,6 +13,8 @@ Serialize* Serialize::getInstance() {
 	return instance;
 }
 
+Serialize::Serialize(QObject* parent) : QObject(parent) {}
+
 QByteArray Serialize::userSerialize(QString user, QString password, QString email, int type, QPixmap* profileImage)
 {
 	/*
@@ -265,8 +267,8 @@ QByteArray Serialize::renameFileSerialize(int fileId, QString newName, int type)
 
 }
 
-QStringList Serialize::renameFileUnserialize(QJsonObject obj){
-	
+QStringList Serialize::renameFileUnserialize(QJsonObject obj) {
+
 	QStringList res;
 
 	res.append(QString(obj.value("oldname").toString()));
@@ -295,7 +297,7 @@ QString Serialize::openSharedFileUnserialize(QJsonObject obj) {
 	return obj.value("URI").toString();
 }
 
-QStringList Serialize::changeProfileResponseUnserialize(QJsonObject obj){
+QStringList Serialize::changeProfileResponseUnserialize(QJsonObject obj) {
 	QStringList list;
 
 	bool res = obj.value("res").toBool();
@@ -335,18 +337,18 @@ QByteArray Serialize::messageSerialize(Message message, int fileId, int type)
 	Nuovo elemento--> messagio che contine la posizione del cursore, se ciò accade il simbolo all'interno sarà vuoto e la posizione diversa da zero
 	controlliamo quindi prima questo caso particolare in modo da non eseguire il codice seguente piu lungo
 	----------------------------------------------------------------------------------------------------------------------------------*/
-	if (message.getCursorPosition().size() > 0) {
-		QJsonArray cursorPos;
+	//if (message.getCursorPosition().size() > 0) {
+	//	QJsonArray cursorPos;
 
-		for (int i : message.getCursorPosition()) {
+	//	for (int i : message.getCursorPosition()) {
 
-			cursorPos.append(QJsonValue(i));
-		}
+	//		cursorPos.append(QJsonValue(i));
+	//	}
 
-		obj.insert("cursor_position", QJsonValue(cursorPos));
-		obj.insert("isSelection", QJsonValue(message.getIsSelection()));
-		return fromObjectToArray(obj);
-	}
+	//	obj.insert("cursor_position", QJsonValue(cursorPos));
+	//	obj.insert("isSelection", QJsonValue(message.getIsSelection()));
+	//	return fromObjectToArray(obj);
+	//}
 
 	Symbol s = message.getSymbol();
 
@@ -552,7 +554,7 @@ QPixmap Serialize::imageUnserialize(QJsonObject obj)
 //-------------------------------------------------------------------------------
 
 
-QByteArray Serialize::responseSerialize(bool res, QString message, int type, QString username, QString email, int userID, QColor color )
+QByteArray Serialize::responseSerialize(bool res, QString message, int type, QString username, QString email, int userID, QColor color)
 {
 	/*
 	res: da fare insieme a chi fa il server dato che sono i messaggi di rispost tipo ok/denied ecc codificati come intero
@@ -846,17 +848,17 @@ QByteArray Serialize::changeProfileSerialize(QString oldUsername, QString newUse
 
 }
 
-QStringList Serialize::changeProfileUnserialize(QJsonObject obj){
-    QStringList list;
+QStringList Serialize::changeProfileUnserialize(QJsonObject obj) {
+	QStringList list;
 
-    list.append(obj.value("oldusername").toString());
-    list.append(obj.value("newusername").toString());
+	list.append(obj.value("oldusername").toString());
+	list.append(obj.value("newusername").toString());
 
-    list.append(obj.value("oldemail").toString());
-    list.append(obj.value("newemail").toString());
-    list.append(obj.value("newimage").toString());
+	list.append(obj.value("oldemail").toString());
+	list.append(obj.value("newemail").toString());
+	list.append(obj.value("newimage").toString());
 
-    return list;
+	return list;
 
 }
 

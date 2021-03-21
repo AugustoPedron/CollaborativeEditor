@@ -39,7 +39,6 @@ class ModifyPassword : public QDialog
 
 public:
 	ModifyPassword(QSharedPointer<SocketHandler> socketHandler, QWidget* parent = Q_NULLPTR);
-	ModifyPassword(QSharedPointer<SocketHandler> socketHandler, QWidget* parent);
 	~ModifyPassword();
 
 private:

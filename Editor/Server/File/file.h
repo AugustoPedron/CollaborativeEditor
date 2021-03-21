@@ -3,7 +3,6 @@
 #include <QObject>
 #include <QTcpSocket>
 
-#include "../CRDT/CRDT.h"
 #include "../Serialize/Serialize.h"
 #include "../ClientManager/clientmanager.h"
 

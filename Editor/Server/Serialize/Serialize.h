@@ -12,7 +12,7 @@
 #include <QPixmap>
 
 #include "define.h"
-#include "../CRDT/Message.h"
+#include "../CRDT/CRDT.h"
 
 class Serialize
 {

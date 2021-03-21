@@ -74,9 +74,9 @@ void MyTextEdit::handleMessage(int id, Message& m, int position) {
 	if (SB != Q_NULLPTR) {
 		SB->setValue(sbPos);
 	}
-	if (m.getAction() == CURSOR_S) {
-		this->repaint();
-	}
+	//if (m.getAction() == CURSOR_S) {
+	//	this->repaint();
+	//}
 }
 
 void MyTextEdit::updateTextSize() {

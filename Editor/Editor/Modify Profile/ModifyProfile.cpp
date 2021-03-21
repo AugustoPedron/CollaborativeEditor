@@ -110,7 +110,6 @@ void ModifyProfile::on_submit_clicked() {
 
 	if (newEmail != "") {
 		if (newUser != "") {
-			QJsonObject userInfoSerialized = m_serializeInstance->changeProfileSerialize(this->m_username, newUser, this->m_email, newEmail, m_croppedImage, CHANGE_PROFILE);//type da definire in define.h  devo usare changeProfileSerialize
 			//bool result = m_socketHandler->writeData(m_serializeInstance->fromObjectToArray(userInfoSerialized));
 			//if (result) {
 			//	m_timer->setSingleShot(true);
@@ -122,7 +121,7 @@ void ModifyProfile::on_submit_clicked() {
 			//	resultDialog.setInformativeText("Errore di connessione");
 			//	resultDialog.exec();
 			//}
-			emit dataToSend(m_serializeInstance->fromObjectToArray(userInfoSerialized));
+			emit dataToSend(m_serializeInstance->changeProfileSerialize(this->m_username, newUser, this->m_email, newEmail, m_croppedImage, CHANGE_PROFILE));
 			//QMessageBox::information(this, "NewAccount", "New Account Created");
 		}
 		else {

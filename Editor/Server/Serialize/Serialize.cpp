@@ -383,18 +383,18 @@ QJsonObject Serialize::messageSerialize(int fileId, Message message, int type)
     Nuovo elemento--> messagio che contine la posizione del cursore, se ciÃ² accade il simbolo all'interno sarÃ  vuoto e la posizione diversa da zero
     controlliamo quindi prima questo caso particolare in modo da non eseguire il codice seguente piu lungo
     ----------------------------------------------------------------------------------------------------------------------------------*/
-    if (message.getCursorPosition().size() > 0) {
-            QJsonArray cursorPos;
+    //if (message.getCursorPosition().size() > 0) {
+    //        QJsonArray cursorPos;
 
-            for (int i : message.getCursorPosition()) {
+    //        for (int i : message.getCursorPosition()) {
 
-                cursorPos.append(QJsonValue(i));
-            }
+    //            cursorPos.append(QJsonValue(i));
+    //        }
 
-            obj.insert("cursor_position", QJsonValue(cursorPos));
-            obj.insert("isSelection", QJsonValue(message.getIsSelection()));
-            return obj;
-    }
+    //        obj.insert("cursor_position", QJsonValue(cursorPos));
+    //        obj.insert("isSelection", QJsonValue(message.getIsSelection()));
+    //        return obj;
+    //}
 
     Symbol s = message.getSymbol();
 
@@ -482,8 +482,8 @@ QPair<int, Message> Serialize::messageUnserialize(QJsonObject obj)
             }
 
             bool isSelection = obj.value("isSelection").toBool();
-            Message m(cursorPosition, action, sender, isSelection);
-            return QPair<int, Message>(fileid, m);
+            //Message m(cursorPosition, action, sender, isSelection);
+            //return QPair<int, Message>(fileid, m);
     }
 
     char c = obj.value("character").toInt();

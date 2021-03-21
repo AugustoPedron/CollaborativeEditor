@@ -54,8 +54,8 @@ void CustomCursor::messageHandler(Message& m, int index) {
 	case CHANGE:
 		updateViewAfterStyleChange(m, index, "");
 		break;
-	case CURSOR_S:
-		setCursorPosition(m_crdt->getCursorPosition(m.getCursorPosition()), ChangePosition, m.getIsSelection());
+	//case CURSOR_S:
+	//	setCursorPosition(m_crdt->getCursorPosition(m.getCursorPosition()), ChangePosition, m.getIsSelection());
 		break;
 	default:
 		break;

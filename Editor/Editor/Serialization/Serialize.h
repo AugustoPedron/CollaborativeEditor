@@ -12,9 +12,7 @@
 #include <QByteArray>
 
 #include "define.h"
-#include "Serialize.h"
-#include "../Editor/CustomCursor.h"
-#include "../CRDT/Message.h"
+#include "../CRDT/CRDT.h"
 
 class Serialize : public QObject
 {
@@ -89,9 +87,6 @@ public:
 
 	QByteArray cursorPostionSerialize(int position, int user, int fileId, int type);
 	std::vector<int> cursorPostionUnserialize(QJsonObject obj);
-
-	QByteArray cursorSerialize(CustomCursor cursor, int type);
-	CustomCursor cursorUnserialize(QJsonObject obj);
 
 	QByteArray addEditingUserSerialize(int userId, QString username, QColor userColor, int fileId, int type);
 	QPair<int, QStringList> addEditingUserUnserialize(QJsonObject obj);

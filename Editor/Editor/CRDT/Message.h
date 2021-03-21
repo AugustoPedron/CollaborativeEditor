@@ -17,7 +17,6 @@ public:
 	Symbol getSymbol() const;
 	int getAction() const;
 	int getSenderId();
-	std::vector<int> getCursorPosition();
 	bool getIsSelection();
 };
 
